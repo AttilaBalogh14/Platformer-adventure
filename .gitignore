@@ -72,3 +72,11 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+/Platformer Adventure/Assets/Sprites/Character
+Platformer Adventure/Packages
+Platformer Adventure/Library
+Platformer Adventure/Logs
+Platformer Adventure/Temp
+Platformer Adventure/ProjectSettings
+Platformer Adventure/UserSettings
