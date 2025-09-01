@@ -74,7 +74,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 /Platformer Adventure/Assets/Sprites/Character
-Platformer Adventure/Packages
+# Platformer Adventure/Packages
 Platformer Adventure/Library
 Platformer Adventure/Logs
 Platformer Adventure/Temp
