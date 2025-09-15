@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class UIManager : MonoBehaviour
 {
     [Header("Game Over")]
-    [SerializeField] private GameObject gameOverScreen;
+    [SerializeField] public GameObject gameOverScreen;
     [SerializeField] private AudioClip gameOverSound;
 
     [Header("Pause")]
@@ -33,6 +33,7 @@ public class UIManager : MonoBehaviour
 
     #region Game Over
     //Activate game over screen
+    
     public void GameOver()
     {
         gameOverScreen.SetActive(true);
@@ -43,6 +44,8 @@ public class UIManager : MonoBehaviour
     public void Restart()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Debug.Log("A restart gomb működik!");
+        Time.timeScale = 1;
     }
 
     public void MainMenu()

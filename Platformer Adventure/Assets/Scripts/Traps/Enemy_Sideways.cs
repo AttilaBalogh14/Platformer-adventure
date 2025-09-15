@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Enemy_Sideways : MonoBehaviour
 {
-    [SerializeField] private float damage;
+    [SerializeField] private float contactDamage;
     [SerializeField] private float movementDistance;
-    [SerializeField] private float speed;
-    private bool movingLeft;
+    [SerializeField] private float moveSpeed;
+    private bool isMovingLeft;
     private float leftEdge;
     private float rightEdge;
 
@@ -19,35 +19,51 @@ public class Enemy_Sideways : MonoBehaviour
 
     private void Update()
     {
-        if (movingLeft)
+        Moving();
+    }
+
+     private void Moving()
+    {
+        if (isMovingLeft)
         {
             if (transform.position.x > leftEdge)
             {
-                transform.position = new Vector3(transform.position.x - speed * Time.deltaTime, transform.position.y, transform.position.z);
+                MoveHorizontally(-1);
             }
             else
             {
-                movingLeft = false;
+                isMovingLeft = false;
             }
         }
         else
         {
             if (transform.position.x < rightEdge)
             {
-                transform.position = new Vector3(transform.position.x + speed * Time.deltaTime, transform.position.y, transform.position.z);
+                MoveHorizontally(1);
             }
             else
             {
-                movingLeft = true;
+                isMovingLeft = true;
             }
         }
     }
 
+    private void MoveHorizontally(int direction)
+    {
+        transform.position = new Vector3(
+            transform.position.x + direction * moveSpeed * Time.deltaTime,
+            transform.position.y,
+            transform.position.z
+        );
+    }
+
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.tag == "Player")
+        if(collision.CompareTag("Player"))
         {
-            collision.GetComponent<Health>().TakeDamage(damage);
+            Health playerHealth = collision.GetComponent<Health>();
+            if (playerHealth != null)
+                playerHealth.TakeDamage(contactDamage);
         }
     }
 }

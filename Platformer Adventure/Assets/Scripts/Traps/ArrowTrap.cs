@@ -4,24 +4,34 @@ using UnityEngine;
 
 public class ArrowTrap : MonoBehaviour
 {
+    [Header("Attack Settings")]
     [SerializeField] private float attackCooldown;
-    [SerializeField] private Transform firePoint;
+    [SerializeField] private Transform spawnPoint;
     [SerializeField] private GameObject[] arrows;
     private float cooldownTimer;
 
-    [Header("SFX")]
-    [SerializeField] private AudioClip arrowSound;
+    [Header("Audio")]
+    [SerializeField] private AudioClip arrowSfx;
 
-    private void Attack()
+    private void Update()
     {
-        cooldownTimer = 0;
+        cooldownTimer += Time.deltaTime;
 
-        SoundManager.instance.PlaySound(arrowSound);
-        arrows[FindArrow()].transform.position = firePoint.position;
-        arrows[FindArrow()].GetComponent<EnemyProjectile>().ActivateProjectile();
+        if (cooldownTimer >= attackCooldown)
+            ShootArrow();
     }
 
-    private int FindArrow()
+    private void ShootArrow()
+    {
+        cooldownTimer = 0f;
+
+        SoundManager.instance.PlaySound(arrowSfx);
+        GameObject arrow = arrows[FindInactiveArrow()];
+        arrow.transform.position = spawnPoint.position;
+        arrow.GetComponent<EnemyProjectile>().ActivateProjectile();
+    }
+
+    private int FindInactiveArrow()
     {
         for (int i = 0; i < arrows.Length; i++)
         {
@@ -31,11 +41,4 @@ public class ArrowTrap : MonoBehaviour
         return 0;
     }
 
-    private void Update()
-    {
-        cooldownTimer += Time.deltaTime;
-
-        if(cooldownTimer >= attackCooldown)
-            Attack();
-    }
 }

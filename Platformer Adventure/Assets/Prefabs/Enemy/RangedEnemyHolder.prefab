@@ -224,12 +224,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startingHealth: 3
   iFramesDuration: 0
-  numberOfFlashes: 0
+  flashCount: 0
   components:
   - {fileID: 1368512061033769812}
-  - {fileID: 0}
-  deathSound: {fileID: 8300000, guid: d2704b6ddae152f44a904d3885f5edf4, type: 3}
-  hurtSound: {fileID: 8300000, guid: 3056bdeec2c9d2e4e903ac951d982be8, type: 3}
+  deathClip: {fileID: 8300000, guid: d2704b6ddae152f44a904d3885f5edf4, type: 3}
+  hurtClip: {fileID: 8300000, guid: 3056bdeec2c9d2e4e903ac951d982be8, type: 3}
+  scoreValue: 100
 --- !u!114 &1368512061033769812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -243,10 +243,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackCooldown: 1
-  range: 13
-  damage: 0
+  detectionRange: 11
+  attackDamage: 1
   firepoint: {fileID: 3375758561225039810}
-  fireballs:
+  projectiles:
   - {fileID: 4291171068098472428}
   - {fileID: 2337329393236492073}
   - {fileID: 5848811086305232253}

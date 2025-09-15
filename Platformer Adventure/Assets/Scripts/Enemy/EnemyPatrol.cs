@@ -13,60 +13,60 @@ public class EnemyPatrol : MonoBehaviour
     [SerializeField] private Transform enemy;
 
     [Header("Movement")]
-    [SerializeField] private float speed;
-    private Vector3 initScale;
-    private bool movingLeft;
+    [SerializeField] private float moveSpeed;
+    private Vector3 initialScale;
+    private bool isMovingLeft;
 
     [Header("Idle Behaviour")]
-    [SerializeField] private float idleDuration;
-    private float idleTimer;
+    [SerializeField] private float idleTime;
+    private float idleCounter;
 
     [Header("Enemy Animator")]
     [SerializeField] private Animator anim;
 
     private void Awake()
     {
-        initScale = enemy.localScale;
+        initialScale = enemy.localScale;
     }
 
     private void Update()
     {
-        if (movingLeft)
+        if (isMovingLeft)
         {
             if (enemy.position.x >= leftEdge.position.x)
                 MoveInDirection(-1);
             else
-                DirectionChange();
+                ChangeDirection();
         }
         else
         {
             if (enemy.position.x <= rightEdge.position.x)
                 MoveInDirection(1);
             else
-                DirectionChange();
+                ChangeDirection();
         }
     }
 
-    private void DirectionChange()
+    private void ChangeDirection()
     {
         anim.SetBool("moving", false);
 
-        idleTimer += Time.deltaTime;
+        idleCounter += Time.deltaTime;
 
-        if (idleTimer > idleDuration)
-            movingLeft = !movingLeft;
+        if (idleCounter >= idleTime)
+            isMovingLeft = !isMovingLeft;
     }
 
-    private void MoveInDirection(int _direction)
+    private void MoveInDirection(int direction)
     {
-        idleTimer = 0;
+        idleCounter = 0f;
         anim.SetBool("moving", true);
 
         //Make enemy face the direction
-        enemy.localScale = new Vector3(Mathf.Abs(initScale.x) * _direction, initScale.y, initScale.z);
+        enemy.localScale = new Vector3(Mathf.Abs(initialScale.x) * direction, initialScale.y, initialScale.z);
 
         //Move in that direction
-        enemy.position = new Vector3(enemy.position.x + Time.deltaTime * _direction * speed, enemy.position.y, enemy.position.z);
+        enemy.position = new Vector3(enemy.position.x + Time.deltaTime * direction * moveSpeed, enemy.position.y, enemy.position.z);
     }
 
     private void OnDisable()

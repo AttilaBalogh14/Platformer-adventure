@@ -4,10 +4,30 @@ using UnityEngine;
 
 public class EnemyDamage : MonoBehaviour
 {
-    [SerializeField] protected float damage;
+    [SerializeField] protected float damage = 1f;
+
     protected void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.tag == "Player" )
-            collision.GetComponent<Health>().TakeDamage(damage);
+        if (collision.CompareTag("Player"))
+        {
+            TryDamage(collision);
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            TryDamage(collision);
+        }
+    }
+
+    private void TryDamage(Collider2D collision)
+    {
+        Health health = collision.GetComponent<Health>();
+        if (health != null && health.CanGetDamage()) // Csak akkor sebez, ha nincs i-frame
+        {
+            health.TakeDamage(damage);
+        }
     }
 }

@@ -15,6 +15,12 @@ public class SelectionArrow : MonoBehaviour
     {
         rect = GetComponent<RectTransform>();
     }
+    
+    void Start()
+    {
+        currentPosition = 0;
+        rect.position = new Vector3(rect.position.x, options[currentPosition].position.y, rect.position.z);
+    }
 
     void Update()
     {
@@ -53,4 +59,5 @@ public class SelectionArrow : MonoBehaviour
         options[currentPosition].GetComponent<Button>().onClick.Invoke();
 
     }
+
 }

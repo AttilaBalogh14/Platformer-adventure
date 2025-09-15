@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 9176746900255781193}
   m_Layer: 0
   m_Name: EnemyFireball
-  m_TagString: Untagged
+  m_TagString: Trap
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -194,5 +194,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
-  speed: 5
-  resetTime: 5
+  speed: 8
+  resetTime: 8

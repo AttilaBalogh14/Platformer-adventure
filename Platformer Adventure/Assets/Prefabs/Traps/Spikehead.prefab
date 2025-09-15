@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1530131427334371264}
   m_Layer: 0
   m_Name: Spikehead
-  m_TagString: Untagged
+  m_TagString: Trap
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -172,10 +172,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
-  speed: 1
-  range: 16
-  checkDelay: 1
+  moveSpeed: 0.5
+  detectionRange: 16
+  checkInterval: 1
   playerLayer:
     serializedVersion: 2
     m_Bits: 1024
-  impactSound: {fileID: 8300000, guid: 13f3a879f7a2dd2419406a3171a68350, type: 3}
+  impactSfx: {fileID: 8300000, guid: 13f3a879f7a2dd2419406a3171a68350, type: 3}

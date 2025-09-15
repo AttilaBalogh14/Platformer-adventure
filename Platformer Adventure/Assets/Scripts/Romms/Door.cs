@@ -7,29 +7,37 @@ public class Door : MonoBehaviour
 {
     [SerializeField] private Transform previousRoom;
     [SerializeField] private Transform nextRoom;
-    [SerializeField] private CameraContoller cam;
+    [SerializeField] private CameraController cam;
 
     private void Awake()
     {
-        cam = Camera.main.GetComponent<CameraContoller>();
+        if (cam == null && Camera.main != null)
+            cam = Camera.main.GetComponent<CameraController>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "Player")
         {
-            if (collision.transform.position.x < transform.position.x)
-            {
-                cam.MoveToNewRoom(nextRoom);
-                nextRoom.GetComponent<Room>().ActivateRoom(true);
-                previousRoom.GetComponent<Room>().ActivateRoom(false);
-            }
-            else
-            {
-                cam.MoveToNewRoom(previousRoom);
-                previousRoom.GetComponent<Room>().ActivateRoom(true);
-                nextRoom.GetComponent<Room>().ActivateRoom(false);
-            }
+           bool isPlayerLeft = collision.transform.position.x < transform.position.x;
+
+        if (isPlayerLeft)
+        {
+            SwitchRoom(nextRoom, previousRoom);
         }
+        else
+        {
+            SwitchRoom(previousRoom, nextRoom);
+        }
+        }
+    }
+
+    private void SwitchRoom(Transform roomToActivate, Transform roomToDeactivate)
+    {
+        if (cam != null)
+            cam.MoveToNewRoom(roomToActivate);
+
+        roomToActivate.GetComponent<Room>().ActivateRoom(true);
+        roomToDeactivate.GetComponent<Room>().ActivateRoom(false);
     }
 }

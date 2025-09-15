@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8080909453387157037}
   m_Layer: 11
   m_Name: FireTrap
-  m_TagString: Enemy
+  m_TagString: Trap
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -144,10 +144,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 866e11feadc1d45499304e89e97a9c73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 1
-  activationDelay: 2
-  activeTime: 2
-  firetrapSound: {fileID: 8300000, guid: 4cbf459f097c73a48bf92698433b8705, type: 3}
+  damageAmount: 1
+  delayBeforeActivation: 2
+  activeDuration: 2
+  firetrapSfx: {fileID: 8300000, guid: 4cbf459f097c73a48bf92698433b8705, type: 3}
 --- !u!95 &8080909453387157037
 Animator:
   serializedVersion: 5

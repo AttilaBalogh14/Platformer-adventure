@@ -7,12 +7,12 @@ public class RangedEnemy : MonoBehaviour
 {
     [Header("Attack Parameters")]
     [SerializeField] private float attackCooldown;
-    [SerializeField] private float range;
-    [SerializeField] private int damage;
+    [SerializeField] private float detectionRange;
+    [SerializeField] private int attackDamage;
 
     [Header("Ranged Attack")]
     [SerializeField] private Transform firepoint;
-    [SerializeField] private GameObject[] fireballs; 
+    [SerializeField] private GameObject[] projectiles; 
 
     [Header("Collider Parameters")]
     [SerializeField] private float colliderDistance;
@@ -40,17 +40,17 @@ public class RangedEnemy : MonoBehaviour
         cooldownTimer += Time.deltaTime;
 
         //Attack only when player in sight
-        if (PlayerInSight())
+        if (IsPlayerInSight())
         {
             if (cooldownTimer >= attackCooldown)
             {
-                cooldownTimer = 0;
+                cooldownTimer = 0f;
                 anim.SetTrigger("rangedAttack");
             }
         }
 
         if (enemyPatrol != null)
-            enemyPatrol.enabled = !PlayerInSight();
+            enemyPatrol.enabled = !IsPlayerInSight();
 
     }
 
@@ -58,33 +58,36 @@ public class RangedEnemy : MonoBehaviour
     {
         SoundManager.instance.PlaySound(fireballSound);
 
-        cooldownTimer = 0;
-        fireballs[findFireball()].transform.position = firepoint.position;
-        fireballs[findFireball()].GetComponent<EnemyProjectile>().ActivateProjectile();
+        cooldownTimer = 0f;
+
+        GameObject projectile = projectiles[FindInactiveProjectile()];
+        projectile.transform.position = firepoint.position;
+        projectile.GetComponent<EnemyProjectile>().ActivateProjectile();
     }
 
-    private int findFireball()
+    private int FindInactiveProjectile()
     {
-        for (int i = 0; i < fireballs.Length; i++)
+        for (int i = 0; i < projectiles.Length; i++)
         {
-            if (!fireballs[i].activeInHierarchy)
+            if (!projectiles[i].activeInHierarchy)
                 return i;
         }
         return 0;
     }
 
-    private bool PlayerInSight()
+    private bool IsPlayerInSight()
     {
-        RaycastHit2D hit = Physics2D.BoxCast(boxCollider.bounds.center + transform.right * range * transform.localScale.x * colliderDistance,
-            new Vector3(boxCollider.bounds.size.x * range, boxCollider.bounds.size.y, boxCollider.bounds.size.z), 0, Vector2.left, 0, playerLayer);
+        Vector3 castOrigin = boxCollider.bounds.center + transform.right * detectionRange * transform.localScale.x * colliderDistance;
+        Vector3 castSize = new Vector3(boxCollider.bounds.size.x * detectionRange, boxCollider.bounds.size.y, boxCollider.bounds.size.z);
 
+        RaycastHit2D hit = Physics2D.BoxCast(castOrigin, castSize, 0f, Vector2.left, 0f, playerLayer);
         return hit.collider != null;
     }
     
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(boxCollider.bounds.center + transform.right * range * transform.localScale.x * colliderDistance,
-            new Vector3(boxCollider.bounds.size.x * range, boxCollider.bounds.size.y, boxCollider.bounds.size.z));
+        Gizmos.DrawWireCube(boxCollider.bounds.center + transform.right * detectionRange * transform.localScale.x * colliderDistance,
+            new Vector3(boxCollider.bounds.size.x * detectionRange, boxCollider.bounds.size.y, boxCollider.bounds.size.z));
     }
 }

@@ -5,63 +5,58 @@ using UnityEngine;
 public class SoundManager : MonoBehaviour
 {
     public static SoundManager instance { get; private set; }
-    private AudioSource soundSource;
+
+    private AudioSource sfxSource;
     private AudioSource musicSource;
 
     void Awake()
     {
-        instance = this;
-        soundSource = GetComponent<AudioSource>();
-        musicSource = transform.GetChild(0).GetComponent<AudioSource>();
-
-        //Keep this object even when we go to new scene
         if (instance == null)
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+
+            sfxSource = GetComponent<AudioSource>();
+            musicSource = transform.GetChild(0).GetComponent<AudioSource>();
+
+            // Initialize with saved volumes
+            ChangeMusicVolume(0);
+            ChangeSoundVolume(0);
         }
-        //Destrox duplicate gameobjects
-        else if (instance != null && instance != this)
+        else if (instance != this)
+        {
             Destroy(gameObject);
-
-        //Assign initial volumes
-        ChangeMusicVolume(0);
-        ChangeSoundVolume(0);
+        }
     }
 
-    public void PlaySound(AudioClip _sound)
+    public void PlaySound(AudioClip clip)
     {
-        soundSource.PlayOneShot(_sound);
+        if (clip != null)
+            sfxSource.PlayOneShot(clip);
     }
 
-    public void ChangeSoundVolume(float _change)
+    public void ChangeSoundVolume(float step)
     {
-        ChangeSourceVolume(1, "soundVolume", _change, soundSource);
+        AdjustVolume(1f, "soundVolume", step, sfxSource);
     }
 
-        public void ChangeMusicVolume(float _change)
+    public void ChangeMusicVolume(float step)
     {
-        ChangeSourceVolume(0.3f, "musicVolume", _change, musicSource);
+        AdjustVolume(0.3f, "musicVolume", step, musicSource);
     }
 
-    private void ChangeSourceVolume(float baseVolume, string volumeName, float change, AudioSource source)
+     private void AdjustVolume(float baseVolume, string prefKey, float step, AudioSource source)
     {
-        //Get initial value of volume and change it
-        float currentVolume = PlayerPrefs.GetFloat(volumeName, 1);
-        currentVolume += change;
+        float current = PlayerPrefs.GetFloat(prefKey, 1f);
+        current += step;
 
-        //Check if we reached the maximum or minimum value
-        if (currentVolume > 1)
-            currentVolume = 0;
-        else if (currentVolume < 0)
-            currentVolume = 1;
+        if (current > 1f)
+            current = 0f;
+        else if (current < 0f)
+            current = 1f;
 
-        //Assign final value
-        float finalValue = currentVolume * baseVolume;
-        source.volume = finalValue;
-
-        //Save final valoe to player prefs
-        PlayerPrefs.SetFloat(volumeName, currentVolume);
+        source.volume = current * baseVolume;
+        PlayerPrefs.SetFloat(prefKey, current);
     }
     
 }

@@ -4,12 +4,15 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    [SerializeField] private float speed;
-    private float direction;
-    private bool hit;
+    [Header("Movement Settings")]
+    [SerializeField] private float moveSpeed;
+    private float travelDir;
+    private bool hasHit;
+    private float lifeTimer;
+
     private BoxCollider2D boxCollider;
     private Animator anim;
-    private float lifetime;
+
 
     void Awake()
     {
@@ -19,43 +22,57 @@ public class Projectile : MonoBehaviour
 
     private void Update()
     {
-        if (hit) return;
-        float movementSpeed = speed * Time.deltaTime * direction;
-        transform.Translate(movementSpeed, 0, 0);
+        if (hasHit)
+            return;
 
-        lifetime += Time.deltaTime;
-        if (lifetime > 5) gameObject.SetActive(false);
+        float step = moveSpeed * Time.deltaTime * travelDir;
+        transform.Translate(step, 0, 0);
+
+        lifeTimer += Time.deltaTime;
+        if (lifeTimer > 5)
+            gameObject.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        hit = true;
+        // Ha checkpoint, ne csináljunk semmit
+        if (collision.CompareTag("Checkpoint"))
+            return;
+        
+        hasHit = true;
         boxCollider.enabled = false;
-        anim.SetTrigger("explode");
 
-        if (collision.tag == "Enemy")
-            collision.GetComponent<Health>().TakeDamage(1);
+        if(anim != null)
+            anim.SetTrigger("explode");
+
+        if (collision.CompareTag("Enemy"))
+        {
+            Health hp = collision.GetComponent<Health>();
+            if (hp != null)
+                hp.TakeDamage(1);
+        }
     }
 
     public void setDirection(float _direction)
     {
-        lifetime = 0;
-        direction = _direction;
+        lifeTimer = 0f;
+        travelDir = _direction;
+        hasHit = false;
+
         gameObject.SetActive(true);
-        hit = false;
         boxCollider.enabled = true;
 
-        float localScaleX = transform.localScale.x;
-        if (Mathf.Sign(localScaleX) != _direction)
+        float scaleX = transform.localScale.x;
+        if (Mathf.Sign(scaleX) != _direction)
         {
-            localScaleX = -localScaleX;
+            scaleX = -scaleX;
         }
 
-        string state =  gameObject.activeSelf.ToString();
-        transform.localScale = new Vector3(localScaleX, transform.localScale.y, transform.localScale.z);
+        //string state =  gameObject.activeSelf.ToString();
+        transform.localScale = new Vector3(scaleX, transform.localScale.y, transform.localScale.z);
     }
 
-    private void Deactivate()
+    public void Deactivate()
     {
         gameObject.SetActive(false);
     }

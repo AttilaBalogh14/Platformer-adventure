@@ -3,50 +3,79 @@ using UnityEngine;
 public class EnemyProjectile : EnemyDamage
 {
     [SerializeField] private float speed;
-    [SerializeField] private float resetTime;
+    [SerializeField] private float resetTime = 5f;
     private float lifetime;
+
     private Animator anim;
     private BoxCollider2D coll;
+    private Rigidbody2D rb;
 
-    private bool hit;
+    private bool hasHit;
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
         coll = GetComponent<BoxCollider2D>();
+        rb = GetComponent<Rigidbody2D>();
+
+        if (rb != null)
+            rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
     }
 
     public void ActivateProjectile()
     {
-        hit = false;
-        lifetime = 0;
+        hasHit = false;
+        lifetime = 0f;
+
         gameObject.SetActive(true);
+
         coll.enabled = true;
+
+        // Ha Rigidbody van, reseteljük a sebességet
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+        }
     }
+
     private void Update()
     {
-        if (hit) return;
-        float movementSpeed = speed * Time.deltaTime;
-        transform.Translate(movementSpeed, 0, 0);
+        if (hasHit) return;
+
+        float movement = speed * Time.deltaTime;
+        transform.Translate(movement, 0, 0);
 
         lifetime += Time.deltaTime;
         if (lifetime > resetTime)
-            gameObject.SetActive(false);
+            Deactivate();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        hit = true;
-        base.OnTriggerEnter2D(collision); //Execute logic from parent script first
+        // Ha checkpoint, átmegyünk rajta
+        if (collision.CompareTag("Checkpoint"))
+            return;
+
+        hasHit = true;
         coll.enabled = false;
 
+        // Trigger parent logic
+        base.OnTriggerEnter2D(collision);
+
         if (anim != null)
-            anim.SetTrigger("explode"); //When the object is a fireball explode it
+        {
+            anim.SetTrigger("explode");
+            // Deaktiválást animáció végére kössük AnimationEvent-tel
+        }
         else
-            gameObject.SetActive(false); //When this hits any object deactivate arrow
+        {
+            Deactivate();
+        }
     }
-    private void Deactivate()
+
+    public void Deactivate()
     {
+        hasHit = false;
         gameObject.SetActive(false);
     }
 }

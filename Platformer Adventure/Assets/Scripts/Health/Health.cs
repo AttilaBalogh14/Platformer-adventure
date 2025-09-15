@@ -1,111 +1,217 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    [Header("Health")]
-    [SerializeField] private float startingHealth;
-    public float currentHealth { get; private set; }
+    [Header("Health Settings")]
+    public float startingHealth = 100;
+    public float currentHealth;
+
+    private bool isDead;
     private Animator anim;
-    private bool dead;
+    private SpriteRenderer spriteRenderer;
 
+    [Header("Invulnerability")]
+    public float iFramesDuration = 0.5f;
+    public int flashCount = 3;
+    private bool isInvulnerable;
 
-    [Header("iFrames")]
-    [SerializeField] private float iFramesDuration;
-    [SerializeField] private int numberOfFlashes;
-    private SpriteRenderer spriterend;
+    private Coroutine hurtCoroutine;
+    private Coroutine powerupCoroutine;
 
     [Header("Components")]
-    [SerializeField] private Behaviour[] components;
+    public Behaviour[] components;
 
-    [Header("Death Sound")]
-    [SerializeField] private AudioClip deathSound;
-    [SerializeField] private AudioClip hurtSound;
+    [Header("Audio")]
+    public AudioClip hurtClip;
+    public AudioClip deathClip;
 
-    private bool invulnerable;
+    [Header("Score")]
+    public int scoreValue = 0;
 
+    private UIManager uIManager;
 
     private void Awake()
     {
-        currentHealth = startingHealth;
+        ResetPlayerState();
         anim = GetComponent<Animator>();
-        spriterend = GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        uIManager = FindObjectOfType<UIManager>();
     }
 
-    public void TakeDamage(float _damage)
+    public void TakeDamage(float damage)
     {
-        if (invulnerable) return;
-
-        currentHealth = Mathf.Clamp(currentHealth - _damage, 0, startingHealth);
-
-        if (currentHealth > 0)
+        if (isDead)
         {
-            anim.SetTrigger("hurt");
-            StartCoroutine(Invunerability());
-            SoundManager.instance.PlaySound(hurtSound);
+            Debug.Log("Nem sebződik, mert már halott.");
+            return;
+        }
+
+        if (isInvulnerable)
+        {
+            Debug.Log("Nem sebződik, mert invulnerable.");
+            return;
+        }
+
+        currentHealth -= damage;
+        Debug.Log("Sebzés: -" + damage + " | Jelenlegi élet: " + currentHealth);
+
+        if (currentHealth <= 0)
+        {
+            Debug.Log("Élet <= 0, meghívjuk a Die()-t!");
+            Die();
         }
         else
         {
-            if (!dead)
-            {
-                //Deactivate all atached component classes
-                foreach (Behaviour comp in components)
-                {
-                    comp.enabled = false;
-                }
-
-                anim.SetBool("grounded", true);
-                anim.SetTrigger("die");
-
-                dead = true;
-                SoundManager.instance.PlaySound(deathSound);
-            }
-
+            anim.SetTrigger("hurt");
+            StartHurtInvulnerability();
+            if (hurtClip != null)
+                SoundManager.instance.PlaySound(hurtClip);
         }
     }
 
-    public void AddHealth(float _value)
+    public bool CanGetDamage()
     {
-        currentHealth = Mathf.Clamp(currentHealth + _value, 0, startingHealth);
+        return !isInvulnerable;
     }
 
-    private IEnumerator Invunerability()
+    private void Die()
     {
-        invulnerable = true;
+        if (isDead) return;
+        isDead = true;
 
-        Physics2D.IgnoreLayerCollision(10, 11, true);
-        for (int i = 0; i < numberOfFlashes; i++)
+        foreach (var comp in components)
+            comp.enabled = false;
+
+        anim.ResetTrigger("die");
+        anim.SetTrigger("die");
+        Debug.Log("Die trigger elküldve az Animatornak!");
+        if (deathClip != null)
+            SoundManager.instance.PlaySound(deathClip);
+
+        if (scoreValue > 0)
         {
-            spriterend.color = new Color(1, 0, 0, 0.5f);
-            yield return new WaitForSeconds(iFramesDuration / (numberOfFlashes * 2));
-            spriterend.color = Color.white;
-            yield return new WaitForSeconds(iFramesDuration / (numberOfFlashes * 2));
+            ScoreEvents.AddScore(scoreValue);
         }
-        Physics2D.IgnoreLayerCollision(10, 11, false);
+        else if (CompareTag("Player"))
+        {
+            StartCoroutine(ShowGameOverScreenWithDelay(1f));
+        }
+    }
 
-        invulnerable = false;
+    private IEnumerator ShowGameOverScreenWithDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (uIManager != null)
+        {
+            uIManager.gameOverScreen.SetActive(true);
+        }
+        Time.timeScale = 0;
+    }
+
+    // Sebződés utáni sebezhetetlenség
+    public void StartHurtInvulnerability()
+    {
+        // Csak akkor induljon el, ha nincs pajzs aktívan
+        if (!isInvulnerable && powerupCoroutine == null)
+        {
+            if (hurtCoroutine != null) StopCoroutine(hurtCoroutine);
+            hurtCoroutine = StartCoroutine(HurtInvulnerabilityCoroutine());
+        }
+    }
+
+    // Pajzs pickup indítása
+    public void StartPowerupInvulnerability(float duration)
+    {
+        // Leállítjuk a villogást teljesen
+        if (hurtCoroutine != null)
+        {
+            StopCoroutine(hurtCoroutine);
+            hurtCoroutine = null;
+        }
+
+        // Ha már fut egy pajzs, újraindítjuk
+        if (powerupCoroutine != null) StopCoroutine(powerupCoroutine);
+        powerupCoroutine = StartCoroutine(InvulnerabilityPowerupCoroutine(duration));
+    }
+
+    private IEnumerator HurtInvulnerabilityCoroutine()
+    {
+        isInvulnerable = true;
+
+        for (int i = 0; i < flashCount; i++)
+        {
+            spriteRenderer.color = new Color(1, 0, 0, 0.5f);
+            yield return new WaitForSeconds(iFramesDuration / (flashCount * 2));
+            spriteRenderer.color = Color.white;
+            yield return new WaitForSeconds(iFramesDuration / (flashCount * 2));
+        }
+
+        isInvulnerable = false;
+        hurtCoroutine = null;
+    }
+
+    private IEnumerator InvulnerabilityPowerupCoroutine(float duration)
+    {
+        isInvulnerable = true;
+        spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f); // Pajzs effekt
+
+        yield return new WaitForSeconds(duration);
+
+        spriteRenderer.color = Color.white; // Visszaáll normálra
+        isInvulnerable = false;
+        powerupCoroutine = null;
+    }
+
+    public bool IsDead()
+    {
+        return isDead;
+    }
+
+    public void AddHealth(float amount)
+    {
+        currentHealth += amount;
+        if (currentHealth > startingHealth)
+            currentHealth = startingHealth;
+    }
+
+    public void Respawn()
+    {
+        isDead = false;
+        currentHealth = startingHealth;
+        anim.ResetTrigger("die");
+        anim.Play("Idle");
+
+        foreach (var comp in components)
+            comp.enabled = true;
+
+        StartHurtInvulnerability();
+    }
+
+    public void ResetHealth()
+    {
+        isDead = false;
+        currentHealth = startingHealth;
+        foreach (Behaviour comp in components)
+        {
+            comp.enabled = true;
+        }
+    }
+
+    private void ResetPlayerState()
+    {
+        isDead = false;
+        currentHealth = startingHealth;
+
+        foreach (Behaviour comp in components)
+        {
+            comp.enabled = true;
+        }
     }
 
     private void Deactivate()
     {
         gameObject.SetActive(false);
-    }
-
-    public void Respawn()
-    {
-        dead = false;
-
-        AddHealth(startingHealth);
-        anim.ResetTrigger("die");
-        anim.Play("Idle");
-        StartCoroutine(Invunerability());
-
-        //Activate all atached component classes
-        foreach (Behaviour comp in components)
-        {
-            comp.enabled = true;
-        }
     }
 }

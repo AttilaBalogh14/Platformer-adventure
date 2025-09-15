@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
-    [SerializeField] private float attackColdown;
+    [Header("Attack Settings")]
+    [SerializeField] private float shootDelay;
     [SerializeField] private Transform firePoint;
-    [SerializeField] private GameObject[] fireballs;
+    [SerializeField] private GameObject[] projectiles;
     [SerializeField] private AudioClip fireballSound;
     private Animator anim;
     private PlayerMovement playerMovement;
-    private float cooldownTimer = Mathf.Infinity;
+    private float timerSinceLastShot = Mathf.Infinity;
 
     private void Awake()
     {
@@ -20,31 +21,34 @@ public class PlayerAttack : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButton(0) && cooldownTimer > attackColdown && playerMovement.canAttack())
+        if (Input.GetMouseButton(0) && timerSinceLastShot > shootDelay /*&& playerMovement.canAttack()*/)
+        {
             Attack();
+        }
 
-        cooldownTimer += Time.deltaTime;
+        timerSinceLastShot += Time.deltaTime;
     }
 
     private void Attack()
     {
-        SoundManager.instance.PlaySound(fireballSound);
+        if (SoundManager.instance != null)
+            SoundManager.instance.PlaySound(fireballSound);
 
         anim.SetTrigger("attack");
-        cooldownTimer = 0;
+        timerSinceLastShot = 0;
 
         //pool fireballs
-        fireballs[FindFireball()].transform.position = firePoint.position;
+        int idx = GetAvailableProjectile();
+        projectiles[idx].transform.position = firePoint.position;
 
-
-        fireballs[FindFireball()].GetComponent<Projectile>().setDirection(Mathf.Sign(transform.localScale.x));
+        projectiles[idx].GetComponent<Projectile>().setDirection(Mathf.Sign(transform.localScale.x));
     }
 
-    private int FindFireball()
+    private int GetAvailableProjectile()
     {
-        for (int i = 0; i < fireballs.Length; i++)
+        for (int i = 0; i < projectiles.Length; i++)
         {
-            if (!fireballs[i].activeInHierarchy)
+            if (!projectiles[i].activeInHierarchy)
                 return i;
         }
         return 0;

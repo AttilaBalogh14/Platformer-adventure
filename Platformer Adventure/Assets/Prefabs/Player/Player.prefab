@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 4703360233249322528}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.01, y: -0.511, z: 0}
+  m_LocalPosition: {x: 1.13, y: -0.511, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -207,10 +207,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ea9197998dc2ab43a04e5d597a30662, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 10
-  jumpPower: 20
-  coyoteTime: 0.25
-  extraJumps: 1
+  moveSpeed: 0
+  jumpStrength: 0
+  coyoteDuration: 0
+  bonusJumps: 0
   wallJumpX: 1500
   wallJumpY: 750
   groundLayer:
@@ -253,19 +253,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39596626ebacf0744ae43406889fbf3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackColdown: 0.3
+  shootDelay: 0
   firePoint: {fileID: 3774224156402621825}
-  fireballs:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  projectiles: []
   fireballSound: {fileID: 8300000, guid: 216d7b7d340ed58449728172814a17c6, type: 3}
 --- !u!114 &151125022573480323
 MonoBehaviour:
@@ -280,13 +270,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startingHealth: 3
+  currentHealth: 0
   iFramesDuration: 1
-  numberOfFlashes: 3
+  flashCount: 3
   components:
   - {fileID: 2045568030193581266}
   - {fileID: 281202812603043672}
-  deathSound: {fileID: 8300000, guid: d2704b6ddae152f44a904d3885f5edf4, type: 3}
-  hurtSound: {fileID: 8300000, guid: 3056bdeec2c9d2e4e903ac951d982be8, type: 3}
+  hurtClip: {fileID: 0}
+  deathClip: {fileID: 0}
+  scoreValue: 0
 --- !u!114 &1575096091305010120
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -299,3 +291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a6703b259b83a04b9345b8a709f8eec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  checkpointSound: {fileID: 8300000, guid: ee8663d331ea7ce458d0eced5107b60f, type: 3}
+  checkpointScoreValue: 200
+  restartButton: {fileID: 0}
+  checkpointButton: {fileID: 0}

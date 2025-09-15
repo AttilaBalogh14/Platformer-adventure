@@ -4,75 +4,83 @@ using UnityEngine;
 
 public class Spikehead : EnemyDamage
 {
-    private Vector3 destination;
-    [SerializeField] private float speed;
-    [SerializeField] private float range;
-    [SerializeField] private float checkDelay;
+    [Header("Movement Settings")]
+    [SerializeField] private float moveSpeed;
+    [SerializeField] private float detectionRange;
+    [SerializeField] private float checkInterval;
     [SerializeField] private LayerMask playerLayer;
     private float checkTimer;
+    private Vector3 moveDirection;
+    private bool isAttacking;
 
-    private bool attacking;
-
-    private Vector3[] directions = new Vector3[4];
+    private Vector3[] possibleDirections = new Vector3[4];
 
     [Header("SFX")]
-    [SerializeField] private AudioClip impactSound;
+    [SerializeField] private AudioClip impactSfx;
 
 
     void OnEnable()
     {
-        Stop();
+        ResetSpikehead();
     }
 
     private void Update()
     {
         //Move spikehead to destination only if attacking 
-        if(attacking)    
-            transform.Translate(destination * Time.deltaTime * speed);
+        if (isAttacking)
+        {
+            Move();
+        }
         else
         {
             checkTimer += Time.deltaTime;
-            if(checkTimer > checkDelay)
-                CheckForPlayer();
+            if(checkTimer > checkInterval)
+                ScanForPlayer();
         }
     }
-
-    private void CheckForPlayer()
+    
+    private void Move()
     {
-        CalculateDirections();
+        transform.Translate(moveDirection * moveSpeed * Time.deltaTime);
+    }
+
+    private void ScanForPlayer()
+    {
+        UpdateDirections();
 
         //check if spikehead sees player in all 4 directions
-        for (int i = 0; i < directions.Length; i++)
+        for (int i = 0; i < possibleDirections.Length; i++)
         {
-            Debug.DrawRay(transform.position, directions[i], Color.red);
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, directions[i], range, playerLayer);
+            Debug.DrawRay(transform.position, possibleDirections[i], Color.red);
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, possibleDirections[i], detectionRange, playerLayer);
 
-            if(hit.collider != null && !attacking)
+            if (hit.collider != null && !isAttacking)
             {
-                attacking = true;
-                destination = directions[i];
-                checkTimer = 0;
+                isAttacking = true;
+                moveDirection = possibleDirections[i];
+                checkTimer = 0f;
             }
         }
     } 
-    private void CalculateDirections()
+    private void UpdateDirections()
     {
-        directions[0] = transform.right * range; //right direction
-        directions[1] = -transform.right * range; //left direction
-        directions[2] = transform.up * range; //up direction
-        directions[3] = -transform.up * range; //right direction
+        possibleDirections[0] = transform.right * detectionRange; //right direction
+        possibleDirections[1] = -transform.right * detectionRange; //left direction
+        possibleDirections[2] = transform.up * detectionRange; //up direction
+        possibleDirections[3] = -transform.up * detectionRange; //right direction
     }
 
-    private void Stop()
+    private void ResetSpikehead()
     {
-        destination = transform.position; //set destination as current position so it doesnt move 
-        attacking = false;
+        moveDirection = transform.position; //set destination as current position so it doesnt move 
+        isAttacking = false;
+        checkTimer = 0f;
     }
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        SoundManager.instance.PlaySound(impactSound);
+        SoundManager.instance.PlaySound(impactSfx);
         base.OnTriggerEnter2D(collision);
-        Stop(); //stop spikehead once he hits something
+        ResetSpikehead(); //stop spikehead once he hits something
     }
 }
