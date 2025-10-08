@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 8651094496738412140}
   - component: {fileID: 6411268485457441689}
   - component: {fileID: 1530131427334371264}
+  - component: {fileID: -4768842754977269038}
+  - component: {fileID: 1135537645508233530}
   m_Layer: 0
   m_Name: Spikehead
   m_TagString: Trap
@@ -30,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.06, y: 2.8, z: 0}
-  m_LocalScale: {x: 4, y: 4, z: 4}
+  m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -179,3 +181,45 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1024
   impactSfx: {fileID: 8300000, guid: 13f3a879f7a2dd2419406a3171a68350, type: 3}
+--- !u!114 &-4768842754977269038
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3061517383351072594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ac01c718ad06dd4690e4d0ae3a774a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startingHealth: 10
+  currentHealth: 0
+  iFramesDuration: 0
+  flashCount: 0
+  components:
+  - {fileID: 1530131427334371264}
+  hurtClip: {fileID: 0}
+  deathClip: {fileID: 0}
+  scoreValue: 200
+--- !u!95 &1135537645508233530
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3061517383351072594}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: de18b2d1bbb9b64458038f8a1e4793ab, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

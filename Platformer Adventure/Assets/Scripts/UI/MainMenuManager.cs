@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuManager : MonoBehaviour
 {
+    [SerializeField] public GameObject ControlsScreen;
+
     public void PlayGame()
     {
         SceneManager.LoadScene("Level1");
@@ -25,5 +27,16 @@ public class MainMenuManager : MonoBehaviour
     public void MusicVolume()
     {
         SoundManager.instance.ChangeMusicVolume(0.2f);
+    }
+
+    public void Control()
+    {
+        ControlsScreen.SetActive(true);
+    }
+
+    void Update()
+    {
+        if (ControlsScreen.activeSelf == true && Input.GetKeyDown(KeyCode.Escape))
+            ControlsScreen.SetActive(false);
     }
 }

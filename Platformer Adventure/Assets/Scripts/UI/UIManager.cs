@@ -20,7 +20,7 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && gameOverScreen.activeSelf == false)
         {
             //If pause screen already active unpause and vicaversa
             if (pauseScreen.activeInHierarchy)
@@ -33,7 +33,7 @@ public class UIManager : MonoBehaviour
 
     #region Game Over
     //Activate game over screen
-    
+
     public void GameOver()
     {
         gameOverScreen.SetActive(true);
@@ -87,4 +87,11 @@ public class UIManager : MonoBehaviour
     }
 
     #endregion
+    
+    public IEnumerator ShowGameOverScreenWithDelay(float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+        gameOverScreen.SetActive(true);
+        Time.timeScale = 0;
+    }
 }

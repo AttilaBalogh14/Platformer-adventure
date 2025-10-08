@@ -173,7 +173,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackCooldown: 1
-  firePoint: {fileID: 8437619688042365928}
+  spawnPoint: {fileID: 8437619688042365928}
   arrows:
   - {fileID: 8202343295136410981}
   - {fileID: 1695852259470667271}
@@ -185,7 +185,7 @@ MonoBehaviour:
   - {fileID: 3251174338306942091}
   - {fileID: 414681934614546255}
   - {fileID: 3264088906554173878}
-  arrowSound: {fileID: 8300000, guid: 1a5257ee9547f2445b914c16e0e88191, type: 3}
+  arrowSfx: {fileID: 8300000, guid: 1a5257ee9547f2445b914c16e0e88191, type: 3}
 --- !u!1 &7293115777363900085
 GameObject:
   m_ObjectHideFlags: 0

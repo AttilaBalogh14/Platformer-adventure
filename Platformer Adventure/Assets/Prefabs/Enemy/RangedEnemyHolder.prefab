@@ -134,7 +134,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 84ce2f114ad12bd4ebafc77060220324, type: 3}
-  m_Color: {r: 0.93207544, g: 0.2303809, b: 0.2303809, a: 1}
+  m_Color: {r: 1, g: 0.5425505, b: 0.3679244, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -223,12 +223,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startingHealth: 3
+  currentHealth: 0
   iFramesDuration: 0
   flashCount: 0
   components:
   - {fileID: 1368512061033769812}
-  deathClip: {fileID: 8300000, guid: d2704b6ddae152f44a904d3885f5edf4, type: 3}
   hurtClip: {fileID: 8300000, guid: 3056bdeec2c9d2e4e903ac951d982be8, type: 3}
+  deathClip: {fileID: 8300000, guid: d2704b6ddae152f44a904d3885f5edf4, type: 3}
   scoreValue: 100
 --- !u!114 &1368512061033769812
 MonoBehaviour:

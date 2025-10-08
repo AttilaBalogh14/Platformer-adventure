@@ -38,14 +38,20 @@ public class Projectile : MonoBehaviour
         // Ha checkpoint, ne csináljunk semmit
         if (collision.CompareTag("Checkpoint"))
             return;
-        
+
+        if (collision.CompareTag("Item"))
+            return;
+
+        if (collision.CompareTag("bossroom"))
+            return;
+
         hasHit = true;
         boxCollider.enabled = false;
 
         if(anim != null)
             anim.SetTrigger("explode");
 
-        if (collision.CompareTag("Enemy"))
+        if (collision.CompareTag("Enemy") || collision.CompareTag("Trap") || collision.CompareTag("Boss"))
         {
             Health hp = collision.GetComponent<Health>();
             if (hp != null)

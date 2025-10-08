@@ -18,10 +18,19 @@ public class Spikehead : EnemyDamage
     [Header("SFX")]
     [SerializeField] private AudioClip impactSfx;
 
+    private Health selfHealth; // saját health
+
+    void Awake()
+    {
+        selfHealth = GetComponent<Health>();
+    }
 
     void OnEnable()
     {
         ResetSpikehead();
+
+        if (selfHealth != null)
+            selfHealth.ResetHealth(); // újraindításkor visszaáll az élete
     }
 
     private void Update()

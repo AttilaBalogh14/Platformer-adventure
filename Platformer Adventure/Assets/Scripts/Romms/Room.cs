@@ -24,46 +24,46 @@ public class Room : MonoBehaviour
     }
 
     public void ActivateRoom(bool isActive)
-{
-    for (int i = 0; i < roomEnemies.Length; i++)
     {
-        GameObject enemy = roomEnemies[i];
+        for (int i = 0; i < roomEnemies.Length; i++)
+        {
+            GameObject enemy = roomEnemies[i];
 
-        if (enemy != null)
-            {
-                // Aktíválás / deaktiválás
-                enemy.SetActive(isActive);
-
-                // Visszaállítjuk az eredeti pozícióra
-                enemy.transform.position = initialPosition[i];
-
-                if (isActive)
+            if (enemy != null)
                 {
-                    // Reseteljük a Health-et
-                    Health health = enemy.GetComponent<Health>();
-                    if (health != null)
-                        health.ResetHealth();
+                    // Aktíválás / deaktiválás
+                    enemy.SetActive(isActive);
 
-                    // Reseteljük az EnemyPatrol-t (ha van)
-                    EnemyPatrol patrol = enemy.GetComponent<EnemyPatrol>();
-                    if (patrol != null)
-                        patrol.enabled = true;
+                    // Visszaállítjuk az eredeti pozícióra
+                    enemy.transform.position = initialPosition[i];
 
-                    // Reseteljük az Animator-t
-                    Animator anim = enemy.GetComponent<Animator>();
-                    if (anim != null)
+                    if (isActive)
                     {
-                        anim.Rebind();       // újrainicializálja az animator állapotot
-                        anim.Update(0f);     // frissítjük az animációt
-                    }
+                        // Reseteljük a Health-et
+                        Health health = enemy.GetComponent<Health>();
+                        if (health != null)
+                            health.ResetHealth();
 
-                    // Ha van MeleeEnemy script, reseteljük a cooldown-t
-                    MeleeEnemy melee = enemy.GetComponent<MeleeEnemy>();
-                    if (melee != null)
-                        melee.ResetEnemy();
+                        // Reseteljük az EnemyPatrol-t (ha van)
+                        EnemyPatrol patrol = enemy.GetComponent<EnemyPatrol>();
+                        if (patrol != null)
+                            patrol.enabled = true;
+
+                        // Reseteljük az Animator-t
+                        Animator anim = enemy.GetComponent<Animator>();
+                        if (anim != null)
+                        {
+                            anim.Rebind();       // újrainicializálja az animator állapotot
+                            anim.Update(0f);     // frissítjük az animációt
+                        }
+
+                        // Ha van MeleeEnemy script, reseteljük a cooldown-t
+                        MeleeEnemy melee = enemy.GetComponent<MeleeEnemy>();
+                        if (melee != null)
+                            melee.ResetEnemy();
+                    }
                 }
-            }
+        }
     }
-}
 
 }

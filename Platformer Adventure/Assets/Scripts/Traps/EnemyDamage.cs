@@ -22,7 +22,7 @@ public class EnemyDamage : MonoBehaviour
         }
     }
 
-    private void TryDamage(Collider2D collision)
+    public void TryDamage(Collider2D collision)
     {
         Health health = collision.GetComponent<Health>();
         if (health != null && health.CanGetDamage()) // Csak akkor sebez, ha nincs i-frame

@@ -56,6 +56,9 @@ public class EnemyProjectile : EnemyDamage
         if (collision.CompareTag("Checkpoint"))
             return;
 
+        if (collision.CompareTag("Item"))
+            return;
+
         hasHit = true;
         coll.enabled = false;
 
