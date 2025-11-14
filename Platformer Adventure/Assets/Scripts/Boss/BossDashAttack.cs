@@ -1,16 +1,17 @@
 using UnityEngine;
+using System.Collections;
 
 public class BossDashAttack : BossAttackBase
 {
     [Header("Dash Settings")]
-    [SerializeField] private float dashSpeed = 12f;       // milyen gyorsan dash-el a boss
-    [SerializeField] private float dashDuration = 0.4f;   // meddig tart a dash
-    [SerializeField] private float dashCooldown = 2f;     // két dash között mennyi idő teljen el
-    [SerializeField] private AudioClip dashSound;         // opcionális hang
+    [SerializeField] private float dashSpeed = 12f;
+    [SerializeField] private float dashDuration = 0.4f;
+    [SerializeField] private float dashCooldown = 2f;
+    [SerializeField] private AudioClip dashSound;
 
     [Header("References")]
-    [SerializeField] private Transform player;            // a player referenciája
-    [SerializeField] private Rigidbody2D rb;              // a boss rigidbody-ja
+    [SerializeField] private Transform player;
+    [SerializeField] private Rigidbody2D rb;
 
     private Animator anim;
     private bool isDashing = false;
@@ -26,45 +27,27 @@ public class BossDashAttack : BossAttackBase
 
     public override void Execute(Transform playerTarget)
     {
-        // 🔹 Ha a dash tiltva, ne fusson
-        BossMovement movement = GetComponentInParent<BossMovement>();
-        if (movement != null && !movement.allowDash)
-            return;
-
-        if (Time.time < lastDashTime + dashCooldown || isDashing)
-            return; // még cooldown-on van
+        if (GetComponentInParent<BossMovement>() is BossMovement movement && !movement.allowDash) return;
+        if (Time.time < lastDashTime + dashCooldown || isDashing) return;
 
         player = playerTarget;
-
-        // Animáció trigger
         anim.SetTrigger("dashattack");
-
-        // Hang lejátszás (ha van)
-        if (SoundManager.instance != null && dashSound != null)
-            SoundManager.instance.PlaySound(dashSound);
-
+        if (SoundManager.instance != null && dashSound != null) SoundManager.instance.PlaySound(dashSound);
         StartCoroutine(PerformDash());
     }
 
-
-    private System.Collections.IEnumerator PerformDash()
+    private IEnumerator PerformDash()
     {
         isDashing = true;
         dashTimer = 0f;
         lastDashTime = Time.time;
 
-        // Meghatározzuk a mozgás irányát a játékos felé
-        Vector2 direction = Vector2.right; // alapértelmezett jobbra
-        if (player != null)
-            direction = (player.position - rb.transform.position).normalized;
-
-        // sprite flip-hez igazítjuk az irányt
+        Vector2 direction = player != null ? (player.position - rb.transform.position).normalized : Vector2.right;
         float facing = Mathf.Sign(direction.x);
         Vector3 localScale = rb.transform.localScale;
         localScale.x = Mathf.Abs(localScale.x) * facing;
         rb.transform.localScale = localScale;
 
-        // Addig dash-el, amíg tart az idő és nincs ütközés
         while (dashTimer < dashDuration && isDashing)
         {
             rb.velocity = new Vector2(direction.x * dashSpeed, rb.velocity.y);
@@ -72,32 +55,29 @@ public class BossDashAttack : BossAttackBase
             yield return null;
         }
 
-        // Dash vége — leállítjuk a mozgást
         rb.velocity = new Vector2(0, rb.velocity.y);
         isDashing = false;
     }
 
-    // Ütközés kezelése
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!isDashing)
-            return;
-
-        // Ha fal vagy akadály (pl. Layer alapján), megáll a dash
-        // Példa: ha a fal Layer neve "Ground"
+        if (!isDashing) return;
         if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
             isDashing = false;
             rb.velocity = new Vector2(0, rb.velocity.y);
+        }
+
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            collision.gameObject.GetComponent<Health>()?.TakeDamage(1);
+            ResolveAttack(true);
         }
     }
 
     public override float GetHeuristicScore(Transform player, Transform boss)
     {
         float horizontalDist = Mathf.Abs(player.position.x - boss.position.x);
-        if (horizontalDist < 4f) return 9f; // közelebb, nagyobb pont
-        return 3f; // távol kevésbé hatékony
+        return horizontalDist < 4f ? 9f : 3f;
     }
-
-
 }

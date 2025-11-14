@@ -1,8 +1,11 @@
 using UnityEngine;
+using System;
 using System.Collections;
 
 public class BossProjectile : MonoBehaviour
 {
+    public event Action OnHitPlayer; // 🔹 Esemény a játékos találatra
+
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 8f;
 
@@ -11,8 +14,8 @@ public class BossProjectile : MonoBehaviour
     [SerializeField] public float baseScaleY = 1f;
 
     [Header("References")]
-    [SerializeField] private Transform player;           // Player referencia
-    [SerializeField] private Animator bossAnimator;      // Boss Animator
+    [SerializeField] private Transform player;
+    [SerializeField] private Animator bossAnimator;
 
     private Vector2 direction;
     private bool hasHit;
@@ -25,9 +28,6 @@ public class BossProjectile : MonoBehaviour
     {
         anim = GetComponent<Animator>();
         boxCollider = GetComponent<BoxCollider2D>();
-
-        if (baseScaleX <= 0) baseScaleX = 1f;
-        if (baseScaleY <= 0) baseScaleY = 1f;
 
         if (player == null)
             player = GameObject.FindGameObjectWithTag("Player")?.transform;
@@ -44,14 +44,12 @@ public class BossProjectile : MonoBehaviour
     {
         if (hasHit) return;
 
-        // Ha attacking03 aktív, frissítjük az irányt a Player felé
         if (bossAnimator != null && bossAnimator.GetBool("attacking03") && player != null)
         {
             Vector2 toPlayer = (player.position - transform.position).normalized;
             direction = toPlayer;
         }
 
-        // Mozgás az aktuális direction alapján
         transform.Translate(direction * moveSpeed * Time.deltaTime, Space.World);
 
         lifeTimer += Time.deltaTime;
@@ -61,7 +59,6 @@ public class BossProjectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Kizáró lista
         if (collision.CompareTag("Checkpoint") ||
             collision.CompareTag("Item") ||
             collision.CompareTag("bossroom") ||
@@ -84,6 +81,8 @@ public class BossProjectile : MonoBehaviour
             Health hp = collision.GetComponent<Health>();
             if (hp != null)
                 hp.TakeDamage(1);
+
+            OnHitPlayer?.Invoke(); // 🔹 Csak akkor jelez, ha eltalálta a játékost
         }
     }
 
@@ -93,13 +92,11 @@ public class BossProjectile : MonoBehaviour
         direction = _direction.normalized;
         hasHit = false;
 
-        // Skála tükrözés X irány szerint
         if (Mathf.Abs(direction.x) > 0.01f)
         {
             transform.localScale = new Vector3(Mathf.Sign(direction.x) * baseScaleX, baseScaleY, 1f);
         }
 
-        // Collider kikapcsolása spawnkor
         boxCollider.enabled = false;
 
         StopAllCoroutines();
@@ -122,17 +119,12 @@ public class BossProjectile : MonoBehaviour
         hasHit = false;
         lifeTimer = 0f;
 
-        // Collider kikapcsolása
         if (boxCollider != null)
             boxCollider.enabled = false;
 
-        // Alap scale visszaállítása
         transform.localScale = new Vector3(baseScaleX, baseScaleY, 1f);
-
-        // Alap rotation visszaállítása
         transform.rotation = Quaternion.identity;
 
-        // Anim trigger reset
         if (anim != null)
             anim.ResetTrigger("explode");
     }

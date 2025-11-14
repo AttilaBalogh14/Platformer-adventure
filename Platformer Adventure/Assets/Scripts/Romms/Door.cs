@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Door : MonoBehaviour
@@ -17,27 +16,34 @@ public class Door : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.tag == "Player")
+        if (collision.CompareTag("Player"))
         {
-           bool isPlayerLeft = collision.transform.position.x < transform.position.x;
+            bool isPlayerLeft = collision.transform.position.x < transform.position.x;
 
-        if (isPlayerLeft)
-        {
-            SwitchRoom(nextRoom, previousRoom);
-        }
-        else
-        {
-            SwitchRoom(previousRoom, nextRoom);
-        }
+            if (isPlayerLeft)
+            {
+                SwitchRoom(nextRoom, previousRoom);
+            }
+            else
+            {
+                SwitchRoom(previousRoom, nextRoom);
+            }
         }
     }
 
     private void SwitchRoom(Transform roomToActivate, Transform roomToDeactivate)
     {
-        if (cam != null)
-            cam.MoveToNewRoom(roomToActivate);
+        Room targetRoom = roomToActivate.GetComponent<Room>();
+        Room oldRoom = roomToDeactivate.GetComponent<Room>();
 
-        roomToActivate.GetComponent<Room>().ActivateRoom(true);
-        roomToDeactivate.GetComponent<Room>().ActivateRoom(false);
+        // ➜ Kamera mozgás a room kamera pontjára
+        if (cam != null && targetRoom.CameraPoint != null)
+            cam.MoveToNewRoom(targetRoom.CameraPoint);
+        else if (cam != null)
+            cam.MoveToNewRoom(roomToActivate); // fallback
+
+        // ➜ Room aktiválás/deaktiválás
+        targetRoom.ActivateRoom(true);
+        oldRoom.ActivateRoom(false);
     }
 }

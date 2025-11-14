@@ -4,6 +4,9 @@ using UnityEngine.SceneManagement;
 public class MainMenuManager : MonoBehaviour
 {
     [SerializeField] public GameObject ControlsScreen;
+    [SerializeField] public GameObject Title;
+    [SerializeField] public GameObject Options;
+    [SerializeField] public GameObject SelectionArrow;
 
     public void PlayGame()
     {
@@ -32,11 +35,19 @@ public class MainMenuManager : MonoBehaviour
     public void Control()
     {
         ControlsScreen.SetActive(true);
+        Title.SetActive(false);
+        Options.SetActive(false);
+        SelectionArrow.SetActive(false);
     }
 
     void Update()
     {
         if (ControlsScreen.activeSelf == true && Input.GetKeyDown(KeyCode.Escape))
+        {
             ControlsScreen.SetActive(false);
+            Title.SetActive(true);
+            Options.SetActive(true);
+            SelectionArrow.SetActive(true);
+        }
     }
 }

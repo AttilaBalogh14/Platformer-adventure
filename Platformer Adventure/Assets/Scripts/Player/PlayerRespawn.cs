@@ -5,11 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class PlayerRespawn : MonoBehaviour
 {
-    [SerializeField] private AudioClip checkpointSound; //Sound that we'll play when picking up a new checkpoint
-    private Transform currentCheckpoint; //we'll store our last checkpoint here
+    [SerializeField] private AudioClip checkpointSound; // Hang, amikor új checkpointot aktiválunk
+    private Transform currentCheckpoint; // Utolsó elért checkpoint
     private Health playerHealth;
     private UIManager uiManager;
-    private static Vector3 checkpointPosition; // statikus, hogy ne törlődjön Scene reload után
+    private static Vector3 checkpointPosition = Vector3.zero; // Statikus, hogy megmaradjon scene reload után
 
     [Header("Score")]
     [SerializeField] private int checkpointScoreValue;
@@ -25,79 +25,126 @@ public class PlayerRespawn : MonoBehaviour
 
     public void CheckRespawn()
     {
-        //Show game over screen
+        // Game Over képernyő megjelenítése
         uiManager.GameOver();
 
-        /*if (currentCheckpoint == null)
+        /*
+        if (currentCheckpoint == null)
         {
             restartButton.SetActive(true);
             checkpointButton.SetActive(false);
-
         }
         else
         {
             restartButton.SetActive(false);
             checkpointButton.SetActive(true);
-        }*/
+        }
+        */
+    }
+
+    public void ResetCurrentCheckpoint()
+    {
+        currentCheckpoint = null;
     }
 
     public void LoadFromCheckpoint()
     {
-        if (currentCheckpoint != null)
+        Debug.Log("LoadFromCheckpoint meghívva!");
+
+        if (currentCheckpoint != null || checkpointPosition != Vector3.zero)
         {
-            // Player állapot visszaállítása
-            transform.position = currentCheckpoint.position;
+            // --- 1️⃣ Pozíció visszaállítása ---
+            Vector3 respawnPos = currentCheckpoint != null ? currentCheckpoint.position : checkpointPosition;
+            transform.position = respawnPos;
+
+            // Rigidbody2D frissítése
+            Rigidbody2D rb = GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.velocity = Vector2.zero;
+                rb.position = respawnPos;
+            }
+
+            // --- 2️⃣ Élet visszaállítása ---
             playerHealth.Respawn();
-            Camera.main.GetComponent<CameraController>().MoveToNewRoom(currentCheckpoint.parent);
+
+            // --- 3️⃣ Szoba és kamera beállítása ---
+            Room checkpointRoom = null;
+
+            if (currentCheckpoint != null)
+                checkpointRoom = currentCheckpoint.GetComponentInParent<Room>();
+
+            if (checkpointRoom != null)
+            {
+                // Szoba aktiválása (ellenségek, animációk, stb.)
+                checkpointRoom.ActivateRoom(true);
+
+                // Kamera áthelyezése a szoba kamera fókuszpontjára
+                CameraController cam = Camera.main.GetComponent<CameraController>();
+                if (cam != null)
+                {
+                    Transform focus = checkpointRoom.CameraPoint != null
+                        ? checkpointRoom.CameraPoint
+                        : checkpointRoom.transform;
+
+                    cam.MoveToNewRoom(focus);
+                    Debug.Log($"Kamera áthelyezve ide: {focus.name}");
+                }
+
+                Debug.Log("Checkpoint szoba újraaktiválva!");
+            }
+            else
+            {
+                // fallback: ha nem található Room komponens
+                Debug.LogWarning("Checkpointhoz nem tartozik Room!");
+                CameraController cam = Camera.main.GetComponent<CameraController>();
+                if (cam != null)
+                    cam.MoveToNewRoom(currentCheckpoint != null ? currentCheckpoint : transform);
+            }
+
+            // --- 4️⃣ UI visszaállítása ---
             uiManager.gameOverScreen.SetActive(false);
             Time.timeScale = 1;
 
-            // Reseteljük a checkpoint szobájának enemy-it
-            Room checkpointRoom = currentCheckpoint.GetComponentInParent<Room>();
-            if (checkpointRoom != null)
-            {
-                checkpointRoom.ActivateRoom(true); // újrapozícionálja és aktiválja az enemy-ket
-            }
-
-            // Visszaállítjuk a pontszámot a checkpointnál tárolt értékre
+            // --- 5️⃣ Pontszám visszaállítása ---
             if (GameScoreManager.Instance != null)
             {
                 GameScoreManager.Instance.SetScore(GameScoreManager.checkpointScore);
+                Debug.Log("Pontszám visszaállítva: " + GameScoreManager.checkpointScore);
             }
 
-            Debug.Log("Checkpoint betöltve, enemy-k resetelve!");
+            Debug.Log("Checkpoint betöltve, játékos pozíció: " + respawnPos);
         }
         else
         {
+            // Ha nincs mentett checkpoint
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             Time.timeScale = 1;
-            Debug.Log("Nincs mentett checkpoint!");
+            Debug.LogWarning("Nincs mentett checkpoint! Újrakezdés...");
         }
     }
 
-    public void TestButton()
-    {
-        Debug.Log("A test gomb működik!");
-    }
-
-    //Activate checkpoints
+    // --- 6️⃣ Checkpoint aktiválása ---
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.transform.tag == "Checkpoint")
+        if (collision.CompareTag("Checkpoint"))
         {
-            currentCheckpoint = collision.transform; //Store the checkpoint that we activated as the current one 
-            checkpointPosition = currentCheckpoint.position; // mentés statikus változóba
+            currentCheckpoint = collision.transform;
+            checkpointPosition = currentCheckpoint.position;
+
             SoundManager.instance.PlaySound(checkpointSound);
-            collision.GetComponent<Collider2D>().enabled = false; //Deactivate checkpoint collider 
-            collision.GetComponent<Animator>().SetTrigger("appear"); //trigger checkpoint animation
+            collision.GetComponent<Collider2D>().enabled = false;
+            collision.GetComponent<Animator>().SetTrigger("appear");
+
             ScoreEvents.AddScore(checkpointScoreValue);
 
-            // Elmentjük a pontszámot, amikor a játékos eléri a checkpointot
             if (GameScoreManager.Instance != null)
             {
                 GameScoreManager.checkpointScore = GameScoreManager.Instance.currentScore;
                 Debug.Log("Checkpoint pontszám mentve: " + GameScoreManager.checkpointScore);
             }
+
+            Debug.Log("Checkpoint elérve: " + checkpointPosition);
         }
     }
 }

@@ -1,103 +1,190 @@
 using UnityEngine;
 
+public enum BossTactic
+{
+    Aggressive,
+    Defensive,
+    Ranged,
+    Evade
+}
+
 public class BossAttackManager : MonoBehaviour
 {
+    [Header("References")]
     [SerializeField] private BossAttackBase[] attacks;
     [SerializeField] private Transform player;
     [SerializeField] private BossForceAttack forcedAttack;
     [SerializeField] private BossLearningMemory memory;
 
+    [Header("Attack Settings")]
+    [SerializeField] private float decisionInterval = 0.5f;
+
     private float cooldownTimer = 0f;
+    private float decisionTimer = 0f;
     private bool isAwake = false;
+
+    private BossTactic currentTactic = BossTactic.Aggressive;
+
+    private void Start()
+    {
+        if (memory == null)
+            memory = GetComponent<BossLearningMemory>();
+
+        foreach (var attack in attacks)
+            if (attack != null)
+                attack.OnAttackResolved += OnAttackResolved;
+    }
 
     private void Update()
     {
         if (!isAwake || player == null) return;
 
+        decisionTimer -= Time.deltaTime;
         cooldownTimer -= Time.deltaTime;
-        memory.ObservePlayer();
 
-        if (cooldownTimer <= 0f)
+        if (decisionTimer <= 0f)
         {
             var bestAttack = ChooseBestAttack();
-            if (bestAttack != null)
+            if (bestAttack != null && cooldownTimer <= 0f)
             {
                 bestAttack.Execute(player);
                 cooldownTimer = bestAttack.cooldown;
             }
+            decisionTimer = decisionInterval;
         }
     }
 
     private BossAttackBase ChooseBestAttack()
     {
-        float bestScore = float.MinValue;
+        currentTactic = DecideTactic();
+
         BossAttackBase bestAttack = null;
+        float bestScore = float.MinValue;
 
         foreach (var attack in attacks)
         {
-            float heuristicScore = attack.GetHeuristicScore(player, transform);
-            float learned = memory.GetEffectiveness(attack) * 3f; // csökkentett súly
-            float predicted = PredictPlayerReaction(attack);
-            float randomFactor = Random.Range(0f, 3f); // kis véletlenség
-
-            float totalScore = heuristicScore + learned + predicted + randomFactor;
-
-            if (totalScore > bestScore)
+            float score = CalculateFuzzyScore(attack, currentTactic);
+            Debug.Log($"[AttackDebug] Attack '{attack.name}', Score={score:F2}, Tactic={currentTactic}");
+            if (score > bestScore)
             {
-                bestScore = totalScore;
+                bestScore = score;
                 bestAttack = attack;
             }
         }
 
+        Debug.Log($"[AttackDebug] Chosen Attack: '{bestAttack?.name}' with score {bestScore:F2}");
         return bestAttack;
     }
 
-    private float PredictPlayerReaction(BossAttackBase attack)
+    private BossTactic DecideTactic()
     {
-        float score = 0f;
-        float jumpTendency = memory.JumpTendency;
-        float aggression = memory.AggressionLevel;
-        float horizontalDist = Mathf.Abs(player.position.x - transform.position.x);
-        float verticalDiff = player.position.y - transform.position.y;
+        float hp = memory.BossHealthPercent();
+        float dist = memory.PlayerDistanceFraction(transform, player);
+        float aggr = memory.AggressionLevel;
+        float jump = memory.JumpTendency;
 
-        // Felfelé támadás – ha player felette van, vagy sokat ugrik
-        if (attack is BossAttackUp && (verticalDiff > 0.2f || jumpTendency > 0.4f))
-            score += 8f;
+        float hpLow = FuzzyLogic.Low(hp);
+        float hpHigh = FuzzyLogic.High(hp);
+        float distNear = FuzzyLogic.Low(dist);
+        float distFar = FuzzyLogic.High(dist);
+        float aggrHigh = FuzzyLogic.High(aggr);
+        float aggrLow = FuzzyLogic.Low(aggr);
+        float jumpHigh = FuzzyLogic.High(jump);
 
-        // Lefelé támadás – ha player alatta van vagy gyakran közelharcol
-        if (attack is BossAttackDown && (verticalDiff < -0.2f || aggression > 0.6f))
-            score += 7f;
+        float evadeRule = FuzzyLogic.And(hpLow, distNear);
+        float defensiveRule = FuzzyLogic.And(distNear, aggrLow);
+        float rangedRule = FuzzyLogic.Or(distFar, jumpHigh);
+        float aggressiveRule = FuzzyLogic.And(aggrHigh, FuzzyLogic.Not(hpLow));
 
-        // Dash – ha player agresszív, vagy közel van
-        if (attack is BossDashAttack && (horizontalDist < 5f || aggression > 0.5f))
-            score += 8f;
+        float max = Mathf.Max(aggressiveRule, defensiveRule, rangedRule, evadeRule);
+        BossTactic chosen = BossTactic.Evade;
+        if (max == aggressiveRule) chosen = BossTactic.Aggressive;
+        else if (max == defensiveRule) chosen = BossTactic.Defensive;
+        else if (max == rangedRule) chosen = BossTactic.Ranged;
 
-        // Fireball – ha player távolságot tart és keveset ugrál
-        if (attack is BossFireballAttack)
-        {
-            if (jumpTendency < 0.4f && horizontalDist > 4f)
-                score += 6f;
-            else
-                score -= 3f; // ne spamelje, ha közel vagy
-        }
-
-        return score;
+        Debug.Log($"[TacticDebug] HP={hp:F2}, Dist={dist:F2}, Agg={aggr:F2}, Jump={jump:F2}, Chosen={chosen}");
+        return chosen;
     }
 
+    private float CalculateFuzzyScore(BossAttackBase attack, BossTactic tactic)
+    {
+        float dist = memory.PlayerDistanceFraction(transform, player);
+        float aggr = memory.AggressionLevel;
+        float jump = memory.JumpTendency;
+        float hp = memory.BossHealthPercent();
+        float playerHeight = memory.PlayerHeightFraction(transform, player);
+
+        float distNear = FuzzyLogic.Low(dist);
+        float distFar = FuzzyLogic.High(dist);
+        float aggrHigh = FuzzyLogic.High(aggr);
+        float jumpHigh = FuzzyLogic.High(jump);
+        float hpLow = FuzzyLogic.Low(hp);
+
+        float baseScore = 0f;
+
+        if (attack is BossFireballAttack)
+            baseScore = FuzzyLogic.SoftOr(distFar, jumpHigh) * 10f;
+        else if (attack is BossDashAttack)
+            baseScore = FuzzyLogic.SoftAnd(distNear, aggrHigh) * 10f;
+        else if (attack is BossAttackUp)
+            baseScore = FuzzyLogic.SoftAnd(jumpHigh, aggrHigh) * 8f + FuzzyLogic.High(playerHeight) * 5f;
+        else if (attack is BossAttackDown)
+            baseScore = FuzzyLogic.SoftAnd(distNear, hpLow) * 7f + FuzzyLogic.Low(playerHeight) * 5f;
+
+        // taktika súlyozás
+        switch (tactic)
+        {
+            case BossTactic.Aggressive: baseScore *= 1.2f; break;
+            case BossTactic.Defensive: baseScore *= 0.9f; break;
+            case BossTactic.Ranged: baseScore *= 1.1f; break;
+            case BossTactic.Evade: baseScore *= 0.6f; break;
+        }
+
+        float learned = memory.GetEffectiveness(attack);
+        baseScore = Mathf.Lerp(baseScore, baseScore * 1.5f, learned);
+
+        // kis random faktor, hogy ritkábban használt támadások is előjöjjenek
+        baseScore += UnityEngine.Random.Range(-1f, 1.5f);
+        return Mathf.Clamp(baseScore, 0f, 15f);
+    }
+
+    private void OnAttackResolved(BossAttackBase attack, bool hit)
+    {
+        if (memory != null)
+            memory.RegisterAttack(attack, hit);
+    }
 
     public void WakeUp()
     {
         isAwake = true;
         cooldownTimer = 0f;
-    }
-
-    public void RegisterAttackResult(BossAttackBase attack, bool hit)
-    {
-        memory.RegisterAttack(attack, hit);
+        decisionTimer = 0f;
     }
 
     public void ForceAttack()
     {
-        if (forcedAttack != null) forcedAttack.Execute();
+        if (forcedAttack != null)
+            forcedAttack.Execute();
     }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (player == null) return;
+        Vector3 gizmoPos = transform.position + Vector3.up * 2f;
+        Color color = Color.white;
+
+        switch (currentTactic)
+        {
+            case BossTactic.Aggressive: color = Color.red; break;
+            case BossTactic.Defensive: color = Color.blue; break;
+            case BossTactic.Ranged: color = Color.yellow; break;
+            case BossTactic.Evade: color = Color.green; break;
+        }
+
+        Gizmos.color = color;
+        Gizmos.DrawSphere(gizmoPos, 0.3f);
+        UnityEditor.Handles.Label(gizmoPos + Vector3.up * 0.5f, $"Tactic: {currentTactic}");
+    }
+#endif
 }

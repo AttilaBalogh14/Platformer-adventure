@@ -1,24 +1,29 @@
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Room : MonoBehaviour
 {
+    [Header("Camera Focus Point")]
+    [SerializeField] private Transform cameraPoint;   // ➜ ezt add hozzá az Inspectorban (Empty object a szoba közepén)
+
+    [Header("Enemies")]
     [SerializeField] private GameObject[] roomEnemies;
     private Vector3[] initialPosition;
 
+    public Transform CameraPoint => cameraPoint;
+
     void Awake()
     {
-        //Save the initial positions for the enemies 
+        // Save the initial positions for the enemies
         initialPosition = new Vector3[roomEnemies.Length];
         for (int i = 0; i < roomEnemies.Length; i++)
         {
             if (roomEnemies[i] != null)
                 initialPosition[i] = roomEnemies[i].transform.position;
         }
-        
-        //Deactivate rooms
+
+        // Deactivate rooms except the first one
         if (transform.GetSiblingIndex() != 0)
             ActivateRoom(false);
     }
@@ -28,42 +33,40 @@ public class Room : MonoBehaviour
         for (int i = 0; i < roomEnemies.Length; i++)
         {
             GameObject enemy = roomEnemies[i];
-
             if (enemy != null)
+            {
+                // Set enemy active or inactive
+                enemy.SetActive(isActive);
+
+                // Reset position
+                enemy.transform.position = initialPosition[i];
+
+                if (isActive)
                 {
-                    // Aktíválás / deaktiválás
-                    enemy.SetActive(isActive);
+                    // 🔹 Respawn Health instead of ResetHealth
+                    Health health = enemy.GetComponent<Health>();
+                    if (health != null)
+                        health.Respawn();
 
-                    // Visszaállítjuk az eredeti pozícióra
-                    enemy.transform.position = initialPosition[i];
+                    // Reset EnemyPatrol if exists
+                    EnemyPatrol patrol = enemy.GetComponent<EnemyPatrol>();
+                    if (patrol != null)
+                        patrol.enabled = true;
 
-                    if (isActive)
+                    // Reset Animator
+                    Animator anim = enemy.GetComponent<Animator>();
+                    if (anim != null)
                     {
-                        // Reseteljük a Health-et
-                        Health health = enemy.GetComponent<Health>();
-                        if (health != null)
-                            health.ResetHealth();
-
-                        // Reseteljük az EnemyPatrol-t (ha van)
-                        EnemyPatrol patrol = enemy.GetComponent<EnemyPatrol>();
-                        if (patrol != null)
-                            patrol.enabled = true;
-
-                        // Reseteljük az Animator-t
-                        Animator anim = enemy.GetComponent<Animator>();
-                        if (anim != null)
-                        {
-                            anim.Rebind();       // újrainicializálja az animator állapotot
-                            anim.Update(0f);     // frissítjük az animációt
-                        }
-
-                        // Ha van MeleeEnemy script, reseteljük a cooldown-t
-                        MeleeEnemy melee = enemy.GetComponent<MeleeEnemy>();
-                        if (melee != null)
-                            melee.ResetEnemy();
+                        anim.Rebind();       // reset animator state
+                        anim.Update(0f);     // refresh animation
                     }
+
+                    // Reset MeleeEnemy cooldown or state
+                    MeleeEnemy melee = enemy.GetComponent<MeleeEnemy>();
+                    if (melee != null)
+                        melee.ResetEnemy();
                 }
+            }
         }
     }
-
 }

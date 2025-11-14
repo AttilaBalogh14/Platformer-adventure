@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -41,10 +42,16 @@ public class Health : MonoBehaviour
 
     private Rigidbody2D rb;
     private Collider2D col;
+
+    // Eredeti Rigidbody értékek mentése
+    private float originalGravityScale;
+    private RigidbodyConstraints2D originalConstraints;
+
     [Header("Boss Attack Integration")]
-    public BossAttackManager attackManager; // referenciát a boss AttackManager-re
-    [SerializeField] private int hitsToForceAttack = 2; // hány találat után erőltetett támadás
-    private int consecutiveHits = 0; // számláló az egymást követő találatokra
+    public BossAttackManager attackManager;
+    [SerializeField] private int hitsToForceAttack = 2;
+    private int consecutiveHits = 0;
+    private bool isGameOver = false;
 
     private void Awake()
     {
@@ -55,24 +62,30 @@ public class Health : MonoBehaviour
         playerMovement = GetComponent<PlayerMovement>();
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
+
+        isGameOver = false;
+
+        if (rb != null)
+        {
+            originalGravityScale = rb.gravityScale;
+            originalConstraints = rb.constraints;
+        }
     }
 
-   public void TakeDamage(float damage)
+    public void TakeDamage(float damage)
     {
         if (isDead) return;
         if (isInvulnerable) return;
 
         currentHealth -= damage;
 
-        // 🔹 Csak boss esetén növeljük a találati számlálót
         if (CompareTag("Boss") && attackManager != null)
         {
             consecutiveHits++;
-
             if (consecutiveHits >= hitsToForceAttack)
             {
-                attackManager.ForceAttack(); // majd létrehozunk egy ilyen függvényt
-                consecutiveHits = 0; // reseteljük
+                attackManager.ForceAttack();
+                consecutiveHits = 0;
             }
         }
 
@@ -97,13 +110,41 @@ public class Health : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
-        // Player Game Over logika mindig
         if (CompareTag("Player"))
         {
+            // 🔹 Nyissuk ki az összes szobát halálkor (inaktívakat is megtaláljuk)
+            foreach (var roomActivator in FindObjectsOfType<ActivateRoomPoint>(true))
+            {
+                if (roomActivator != null && roomActivator.objectToShow != null)
+                {
+                    roomActivator.objectToShow.SetActive(false);
+                }
+            }
+
+            /*foreach (var roomDeactivator in FindObjectsOfType<DeactivateRoomPoint>(true))
+            {
+                if (roomDeactivator != null && roomDeactivator.objectToHide != null)
+                {
+                    roomDeactivator.objectToHide.SetActive(false);
+                }
+            }*/
+
             deathCount++;
-            // Game Over logika: a UIManager-en futtatjuk
+            isGameOver = true;
+
             if (uIManager != null)
+            {
+                // 🔹 Tiltsuk le a pause-t halál után
+                uIManager.DisablePause();
                 uIManager.StartCoroutine(uIManager.ShowGameOverScreenWithDelay(1f));
+            }
+
+            // 🔹 Boss resetelése, ha aktív
+            BossMovement boss = FindObjectOfType<BossMovement>();
+            if (boss != null && boss.BossIsAwake())
+                boss.ResetBoss();
+
+            Debug.Log("🔓 All rooms opened after player death!");
         }
 
         if (CompareTag("Trap"))
@@ -114,7 +155,6 @@ public class Health : MonoBehaviour
             return;
         }
 
-        // Boss logika
         if (CompareTag("Boss") && !IsGrounded())
         {
             if (deathCoroutine != null) StopCoroutine(deathCoroutine);
@@ -125,12 +165,15 @@ public class Health : MonoBehaviour
             DieOnGround();
         }
 
-        // Score hozzáadás
         if (scoreValue > 0)
             ScoreEvents.AddScore(scoreValue);
     }
 
-    // Új coroutine a levegőben történő halál kezelésére
+    public bool IsGameOver()
+    {
+        return isGameOver;
+    }
+
     private IEnumerator DieInAirCoroutine()
     {
         OnDeathEvent?.Invoke();
@@ -141,27 +184,21 @@ public class Health : MonoBehaviour
         anim.SetBool("isJumping", false);
         anim.SetBool("dead", true);
 
-        // Lehetővé tesszük az esést
         if (rb != null)
         {
-            rb.gravityScale = 3f; // vagy az eredeti gravityScale
+            rb.gravityScale = originalGravityScale;
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
 
         if (col != null)
             col.enabled = true;
 
-        // Várakozás a földre érésig
         while (!IsGrounded())
-        {
             yield return null;
-        }
 
-        // Földre érve végrehajtjuk a halál logikát
         DieOnGround();
     }
 
-    // A régi földön történő halál logika
     private void DieOnGround()
     {
         OnDeathEvent?.Invoke();
@@ -190,14 +227,19 @@ public class Health : MonoBehaviour
         foreach (var comp in components)
             comp.enabled = false;
 
-        StartCoroutine(DisableAfterDelay(0.6f));
+        if (!CompareTag("Player"))
+            StartCoroutine(DisableAfterDelay(0.6f));
     }
 
     private bool IsGrounded()
     {
+        if (col == null) return true;
+
         if (col is BoxCollider2D box)
         {
-            RaycastHit2D hit = Physics2D.BoxCast(box.bounds.center, box.bounds.size, 0f, Vector2.down, 0.1f, LayerMask.GetMask("Ground"));
+            RaycastHit2D hit = Physics2D.BoxCast(
+                box.bounds.center, box.bounds.size, 0f,
+                Vector2.down, 0.1f, LayerMask.GetMask("Ground"));
             return hit.collider != null;
         }
         return true;
@@ -276,19 +318,51 @@ public class Health : MonoBehaviour
     {
         isDead = false;
         currentHealth = startingHealth;
-        anim.ResetTrigger("die");
-        anim.Play("Idle");
+
+        if (anim != null)
+        {
+            anim.ResetTrigger("die");
+            anim.SetBool("dead", false);
+            anim.Play("Idle", 0, 0f);
+        }
+
+        if (rb != null)
+        {
+            rb.constraints = originalConstraints;
+            rb.gravityScale = originalGravityScale;
+            rb.velocity = Vector2.zero;
+        }
+
+        if (col != null)
+            col.enabled = true;
 
         foreach (var comp in components)
             comp.enabled = true;
 
         StartHurtInvulnerability();
+
+        // ✅ Pause újra engedélyezése
+        if (uIManager != null)
+            uIManager.EnablePause();
+
+        foreach (var trigger in FindObjectsOfType<BossRoomTrigger>())
+        {
+            trigger.ResetTriggerState();
+        }
+
     }
+
 
     public void ResetHealth()
     {
         isDead = false;
         currentHealth = startingHealth;
+
+        if (deathCoroutine != null)
+        {
+            StopCoroutine(deathCoroutine);
+            deathCoroutine = null;
+        }
 
         foreach (var comp in components)
             comp.enabled = true;
@@ -296,8 +370,23 @@ public class Health : MonoBehaviour
         if (anim != null)
         {
             anim.ResetTrigger("die");
+            anim.SetBool("dead", false);
+            anim.SetBool("isJumping", false);
+            anim.SetBool("grounded", true);
             anim.Play("Idle", 0, 0f);
         }
+
+        if (rb != null)
+        {
+            rb.constraints = originalConstraints;
+            rb.gravityScale = originalGravityScale;
+            rb.velocity = Vector2.zero;
+        }
+
+        if (col != null)
+            col.enabled = true;
+
+        consecutiveHits = 0;
     }
 
     private void ResetPlayerState()

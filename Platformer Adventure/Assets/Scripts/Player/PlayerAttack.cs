@@ -21,7 +21,7 @@ public class PlayerAttack : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButton(0) && timerSinceLastShot > shootDelay /*&& playerMovement.canAttack()*/)
+        if (Input.GetMouseButton(0) && timerSinceLastShot > shootDelay || Input.GetKeyDown(KeyCode.Space) && timerSinceLastShot > shootDelay/*&& playerMovement.canAttack()*/)
         {
             Attack();
         }
