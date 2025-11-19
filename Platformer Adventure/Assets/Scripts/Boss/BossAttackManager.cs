@@ -102,7 +102,6 @@ public class BossAttackManager : MonoBehaviour
         else if (max == defensiveRule) chosen = BossTactic.Defensive;
         else if (max == rangedRule) chosen = BossTactic.Ranged;
 
-        Debug.Log($"[TacticDebug] HP={hp:F2}, Dist={dist:F2}, Agg={aggr:F2}, Jump={jump:F2}, Chosen={chosen}");
         return chosen;
     }
 
@@ -125,7 +124,7 @@ public class BossAttackManager : MonoBehaviour
         if (attack is BossFireballAttack)
             baseScore = FuzzyLogic.SoftOr(distFar, jumpHigh) * 10f;
         else if (attack is BossDashAttack)
-            baseScore = FuzzyLogic.SoftAnd(distNear, aggrHigh) * 10f;
+            baseScore = FuzzyLogic.SoftAnd(distNear, aggrHigh) * 12f;
         else if (attack is BossAttackUp)
             baseScore = FuzzyLogic.SoftAnd(jumpHigh, aggrHigh) * 8f + FuzzyLogic.High(playerHeight) * 5f;
         else if (attack is BossAttackDown)

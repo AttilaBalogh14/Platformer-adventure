@@ -48,13 +48,19 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 crouchingOffset = new Vector2(0.0465f, -0.723f);
     private Vector2 crouchingSize = new Vector2(0.8738f, 0.9721f);
 
+    // 🔹 Teszt input
+    [SerializeField] private bool useTestingInput = false;
+    private float testingHorizontalInput = 0f;
+
+    [SerializeField] private bool useTestingCrouch = false;
+    private bool testingCrouch = false;
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         boxCollider = GetComponent<BoxCollider2D>();
 
-        // 🔹 elmentjük az eredeti értékeket
         originalMoveSpeed = moveSpeed;
         originalJumpStrength = jumpStrength;
         originalBonusJumps = bonusJumps;
@@ -62,16 +68,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        if (Time.timeScale == 0)
-            return;
+        if (Time.timeScale == 0) return;
 
         if (playerHealth != null && playerHealth.IsDead())
         {
             body.velocity = Vector2.zero;
-            return; // NE írjuk felül az animátort halál után
+            return;
         }
 
-        horizontalInput = Input.GetAxisRaw("Horizontal");
+        horizontalInput = useTestingInput ? testingHorizontalInput : Input.GetAxisRaw("Horizontal");
 
         if (horizontalInput > 0.01f)
             transform.localScale = Vector3.one;
@@ -81,20 +86,13 @@ public class PlayerMovement : MonoBehaviour
         anim.SetBool("run", horizontalInput != 0);
         anim.SetBool("grounded", CheckGround());
 
-        // Guggolás input figyelése
-        if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
-        {
-            isCrouching = true;
-        }
+        // Guggolás felülbírálása tesztnél
+        if (useTestingCrouch)
+            isCrouching = testingCrouch;
         else
-        {
-            isCrouching = false;
-        }
+            isCrouching = Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S);
 
-        // BoxCollider frissítése
         UpdateCollider();
-
-        // Animator frissítése
         anim.SetBool("crouch", isCrouching);
 
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
@@ -112,7 +110,6 @@ public class PlayerMovement : MonoBehaviour
         {
             body.gravityScale = 7;
 
-            // 🔹 Mozgás closedDoor ellenőrzéssel
             if (!isCrouching)
             {
                 Vector2 moveDir = new Vector2(horizontalInput * moveSpeed, body.velocity.y);
@@ -123,10 +120,7 @@ public class PlayerMovement : MonoBehaviour
                                       new Vector2(Mathf.Sign(horizontalInput), 0), 0.1f)
                                    .collider?.CompareTag("closedDoor") ?? false;
 
-                    if (!hitDoor)
-                        body.velocity = moveDir;
-                    else
-                        body.velocity = new Vector2(0, body.velocity.y); // nem mozog át az ajtón
+                    body.velocity = hitDoor ? new Vector2(0, body.velocity.y) : moveDir;
                 }
                 else
                 {
@@ -135,7 +129,7 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                body.velocity = new Vector2(0, body.velocity.y); // guggolás közben nem mozog
+                body.velocity = new Vector2(0, body.velocity.y);
             }
 
             if (CheckGround())
@@ -144,7 +138,9 @@ public class PlayerMovement : MonoBehaviour
                 jumpsleft = bonusJumps;
             }
             else
+            {
                 coyoteTimer -= Time.deltaTime;
+            }
         }
     }
 
@@ -164,8 +160,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void DoJump()
     {
-        if (coyoteTimer < 0 && !CheckWall() && jumpsleft <= 0)
-            return;
+        if (coyoteTimer < 0 && !CheckWall() && jumpsleft <= 0) return;
 
         if (SoundManager.instance != null)
             SoundManager.instance.PlaySound(jumpSound);
@@ -176,19 +171,12 @@ public class PlayerMovement : MonoBehaviour
         {
             if (CheckGround() || coyoteTimer > 0)
                 body.velocity = new Vector2(body.velocity.x, jumpStrength);
-            else
+            else if (jumpsleft > 0)
             {
-                if (coyoteTimer > 0)
-                    body.velocity = new Vector2(body.velocity.x, jumpStrength);
-                else
-                {
-                    if (jumpsleft > 0)
-                    {
-                        body.velocity = new Vector2(body.velocity.x, jumpStrength);
-                        jumpsleft--;
-                    }
-                }
+                body.velocity = new Vector2(body.velocity.x, jumpStrength);
+                jumpsleft--;
             }
+
             coyoteTimer = 0;
         }
     }
@@ -237,5 +225,30 @@ public class PlayerMovement : MonoBehaviour
         bonusJumps = originalBonusJumps;
 
         speedBoostCoroutine = null;
+    }
+
+    public void SetHorizontalInput(float value)
+    {
+        useTestingInput = true;
+        testingHorizontalInput = value;
+    }
+
+    public float MoveSpeed
+    {
+        get => moveSpeed;
+        set => moveSpeed = value;
+    }
+
+    public void JumpForTest(int extraJumps = 0)
+    {
+        jumpsleft += extraJumps;
+        DoJump();
+    }
+
+    public void CrouchForTest(bool crouch)
+    {
+        useTestingCrouch = true;
+        testingCrouch = crouch;
+        UpdateCollider();
     }
 }

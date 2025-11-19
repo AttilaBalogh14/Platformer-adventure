@@ -399,4 +399,21 @@ public class Health : MonoBehaviour
     }
 
     public static int DeathCounter() => deathCount;
+
+    #if UNITY_EDITOR
+    public void TestDamage(float damage)
+    {
+        currentHealth -= damage;
+        if (currentHealth < 0)
+            currentHealth = 0;
+
+        if (currentHealth == 0)
+        {
+            typeof(Health).GetField("isDead",
+                System.Reflection.BindingFlags.NonPublic |
+                System.Reflection.BindingFlags.Instance)
+                ?.SetValue(this, true);
+        }
+    }
+    #endif
 }
