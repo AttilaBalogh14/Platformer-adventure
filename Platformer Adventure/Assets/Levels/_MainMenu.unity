@@ -1441,7 +1441,7 @@ GameObject:
   - component: {fileID: 702780545}
   - component: {fileID: 702780544}
   m_Layer: 5
-  m_Name: Volume text
+  m_Name: Sounds text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1599,7 +1599,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Volume
+  m_Text: Sounds
 --- !u!222 &702780549
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2740,7 +2740,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1197400984}
   m_Layer: 5
-  m_Name: PauseScreen
+  m_Name: MainMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
