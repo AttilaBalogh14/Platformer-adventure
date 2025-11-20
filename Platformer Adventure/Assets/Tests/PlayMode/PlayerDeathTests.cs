@@ -24,7 +24,7 @@ public class PlayerDeathTests
         uiManager = Object.FindObjectOfType<UIManager>();
         Assert.IsNotNull(uiManager, "UIManager nem található a scene-ben!");
 
-        // Biztosítsuk, hogy GameOver képernyő ki legyen kapcsolva
+        //Biztosítsuk, hogy GameOver képernyő ki legyen kapcsolva
         if (uiManager.gameOverScreen != null)
             uiManager.gameOverScreen.SetActive(false);
 
@@ -34,10 +34,10 @@ public class PlayerDeathTests
     [UnityTest]
     public IEnumerator PlayerDies_WhenHealthReachesZero()
     {
-        // Biztosra megyünk, hogy a health nagyon alacsony
+        //Biztosra megyünk, hogy a health nagyon alacsony
         health.TakeDamage(health.currentHealth);
 
-        // Várjunk 1 frame-et, hogy a Die() lefusson
+        //Várjunk 1 frame-et, hogy a Die() lefusson
         yield return null;
 
         Assert.IsTrue(health.IsDead(), "A játékosnak halottnak kell lennie!");

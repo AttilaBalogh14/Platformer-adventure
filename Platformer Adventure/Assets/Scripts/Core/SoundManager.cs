@@ -19,7 +19,6 @@ public class SoundManager : MonoBehaviour
             sfxSource = GetComponent<AudioSource>();
             musicSource = transform.GetChild(0).GetComponent<AudioSource>();
 
-            // Initialize with saved volumes
             ChangeMusicVolume(0);
             ChangeSoundVolume(0);
         }

@@ -43,7 +43,7 @@ public class BossMovement : MonoBehaviour
     [SerializeField] private GameObject winScene;
     [SerializeField] private AudioClip winSound;
 
-    // 🔹 új flag a duplikált hívások elkerülésére
+    //flag a duplikált hívások elkerülésére
     private bool hasHandledDeath = false;
 
     void Awake()
@@ -231,7 +231,7 @@ public class BossMovement : MonoBehaviour
     {
         isAwake = false;
         isDead = false;
-        hasHandledDeath = false; // 🔹 visszaállítjuk, hogy újra működjön
+        hasHandledDeath = false; //visszaállítjuk, hogy újra működjön
 
         if (health != null) health.ResetHealth();
         if (bossTeleport != null) bossTeleport.ResetTeleportState();

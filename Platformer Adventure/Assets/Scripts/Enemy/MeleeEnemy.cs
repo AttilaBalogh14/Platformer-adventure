@@ -19,17 +19,17 @@ public class MeleeEnemy : MonoBehaviour
     [Header("Attack Sound")]
     [SerializeField] private AudioClip attackSfx;
 
-    // References
+    //References
     private Animator anim;
     private Health playerHealth;
     private EnemyPatrol enemyPatrol;
-    private Health selfHealth; // <- saját health
+    private Health selfHealth; //saját health
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
         enemyPatrol = GetComponentInParent<EnemyPatrol>();
-        selfHealth = GetComponent<Health>(); // enemy saját health-je
+        selfHealth = GetComponent<Health>(); //enemy saját health-je
     }
 
     private void OnEnable()
@@ -38,14 +38,14 @@ public class MeleeEnemy : MonoBehaviour
 
         if (selfHealth != null)
         {
-            // Kis késleltetéssel, hogy minden komponens aktív legyen
+            //Kis késleltetéssel, hogy minden komponens aktív legyen
             StartCoroutine(ResetHealthNextFrame());
         }
     }
 
     private IEnumerator ResetHealthNextFrame()
     {
-        yield return null; // vár egy frame-et
+        yield return null; //vár egy frame-et
         selfHealth.ResetHealth();
     }
 
@@ -107,15 +107,15 @@ public class MeleeEnemy : MonoBehaviour
     {
         cooldownTimer = Mathf.Infinity;
 
-        // Reseteljük a saját Health-et
+        //Reseteljük a saját Health-et
         if (selfHealth != null)
             selfHealth.ResetHealth();
 
-        // Engedélyezzük a patrol-t újra
+        //Engedélyezzük a patrol-t újra
         if (enemyPatrol != null)
             enemyPatrol.enabled = true;
 
-        // Reseteljük az Animator-t
+        //Reseteljük az Animator-t
         if (anim != null)
         {
             anim.Rebind();

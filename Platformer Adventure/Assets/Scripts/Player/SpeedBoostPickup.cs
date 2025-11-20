@@ -7,7 +7,7 @@ public class SpeedBoostPickup : MonoBehaviour
     public float jumpMultiplier = 1.3f;
     public int extraJumps = 1;
 
-    [SerializeField] private float respawnTime; // ennyi idő után újraspawnol
+    [SerializeField] private float respawnTime; //ennyi idő után újraspawnol
 
     private SpriteRenderer spriteRenderer;
     private Collider2D pickupCollider;
@@ -28,21 +28,21 @@ public class SpeedBoostPickup : MonoBehaviour
                 playerMovement.ApplySpeedBoost(duration, speedMultiplier, jumpMultiplier, extraJumps);
             }
 
-            // pickup kikapcsolása és respawn elindítása
+            //pickup kikapcsolása és respawn elindítása
             StartCoroutine(RespawnCoroutine());
         }
     }
 
     private System.Collections.IEnumerator RespawnCoroutine()
     {
-        // kikapcsoljuk a grafikát és a collidert
+        //kikapcsoljuk a grafikát és a collidert
         spriteRenderer.enabled = false;
         pickupCollider.enabled = false;
 
-        // várakozás
+        //várakozás
         yield return new WaitForSeconds(respawnTime);
 
-        // újra bekapcsoljuk
+        //újra bekapcsoljuk
         spriteRenderer.enabled = true;
         pickupCollider.enabled = true;
     }

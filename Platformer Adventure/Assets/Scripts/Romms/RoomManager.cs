@@ -16,6 +16,6 @@ public class RoomManager : MonoBehaviour
                 deactivator.objectToHide.SetActive(true);
         }
 
-        Debug.Log("All rooms have been opened!");
+        Debug.Log("Az összes szoba kinyitva");
     }
 }

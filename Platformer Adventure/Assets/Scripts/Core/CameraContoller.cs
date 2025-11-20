@@ -3,7 +3,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     [Header("Room Transition Settings")]
-    [SerializeField] private float smoothTime = 0.3f; // minél nagyobb, annál lassabb az átúszás
+    [SerializeField] private float smoothTime = 0.3f; //minél nagyobb, annál lassabb az átúszás
     private Vector3 targetPos;
     private Vector3 velocity = Vector3.zero;
 
@@ -26,16 +26,16 @@ public class CameraController : MonoBehaviour
             camera.orthographicSize = camera.orthographicSize / scaleHeight;
         }
 
-        // alap cél a jelenlegi pozíció
+        //alap cél a jelenlegi pozíció
         targetPos = transform.position;
     }
 
     private void Update()
     {
-        // Finom átúszás a cél pozícióra
+        //Finom átúszás a cél pozícióra
         transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref velocity, smoothTime);
 
-        // --- Alternatív: player követés ---
+        //Alternatív: player követés
         /*
         transform.position = new Vector3(player.position.x + lookAhead, transform.position.y, transform.position.z);
         lookAhead = Mathf.Lerp(lookAhead, aheadDistance * player.localScale.x, Time.deltaTime * followSmooth);

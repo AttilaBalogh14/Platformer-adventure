@@ -7,7 +7,7 @@ public class HealthCollectable : MonoBehaviour
     [SerializeField] private float healthValue = 1f;
     [SerializeField] private AudioClip pickupSound;
 
-    // 👇 Új: esemény, amit a RoomController meghallhat
+    //esemény, amit a RoomController meghallhat
     public System.Action OnPickedUp;
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -17,7 +17,7 @@ public class HealthCollectable : MonoBehaviour
             SoundManager.instance.PlaySound(pickupSound);
             collision.GetComponent<Health>()?.AddHealth(healthValue);
 
-            // jelezzük a RoomControllernek, hogy ez inaktiválódott
+            //jelezzük a RoomControllernek, hogy ez inaktiválódott
             OnPickedUp?.Invoke();
 
             gameObject.SetActive(false);

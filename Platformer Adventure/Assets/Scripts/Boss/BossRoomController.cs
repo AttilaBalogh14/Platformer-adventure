@@ -113,7 +113,7 @@ public class BossRoomController : MonoBehaviour
         float jumpTendency = bossMemory.JumpTendency;
         float deathsFactor = Mathf.Clamp01((float)deathsDuringBossFight / 5f);
 
-        // --- Fuzzy szabályok ---
+        //Fuzzy szabályok
         float healthLow = FuzzyLogic.Low(healthPercent);
         float aggrHigh = FuzzyLogic.High(aggression);
         float jumpHigh = FuzzyLogic.High(jumpTendency);
@@ -136,7 +136,7 @@ public class BossRoomController : MonoBehaviour
         if (Time.time < nextInvulSpawnTime)
             return;
 
-        // --- Fuzzy halmazok ---
+        //Fuzzy halmazok
         float playerHPPercent = playerHealth.currentHealth / playerHealth.startingHealth;
         float bossHPPercent = bossMemory.BossHealthPercent();
         float aggression = bossMemory.AggressionLevel;
@@ -156,7 +156,7 @@ public class BossRoomController : MonoBehaviour
         float deathsHigh = FuzzyLogic.High(deathsFactor);
         float lowHPTimeHigh = FuzzyLogic.High(lowHPTimeFactor);
 
-        // --- Fuzzy szabályok a spawn esélyre ---
+        //Fuzzy szabályok a spawn esélyre
         float rule1 = FuzzyLogic.Or(playerHPLow, lowHPTimeHigh);
         float rule2 = bossHPLow;
         float rule3 = FuzzyLogic.Or(aggrHigh, jumpHigh);

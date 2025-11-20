@@ -128,7 +128,7 @@ public class BossTeleport : MonoBehaviour
         isTeleporting = false;
     }
 
-    // --- Fuzzy döntés a magas teleporthoz ---
+    //Fuzzy döntés a magas teleporthoz
     private bool ShouldTeleportHigh()
     {
         if (memory == null || bossHealth == null) return false;
@@ -143,10 +143,10 @@ public class BossTeleport : MonoBehaviour
         float jumpHigh = FuzzyLogic.High(jump);
         float dmgHigh = FuzzyLogic.High(dmg / 5f);
 
-        // Soft fuzzy szabály
+        //Soft fuzzy szabály
         float rule = FuzzyLogic.SoftAnd(FuzzyLogic.SoftOr(hpLow, dmgHigh), FuzzyLogic.SoftOr(aggrHigh, jumpHigh));
 
-        // Random faktor hozzáadva
+        //Random faktor hozzáadva
         rule += Random.Range(-0.1f, 0.2f);
         rule = Mathf.Clamp01(rule);
 

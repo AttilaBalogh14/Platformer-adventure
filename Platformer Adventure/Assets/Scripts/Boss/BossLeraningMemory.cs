@@ -148,13 +148,13 @@ public class BossLearningMemory : MonoBehaviour
 
         Vector2 delta = (Vector2)player.position - lastPlayerPos;
 
-        // Jump tendency figyelés
+        //Jump tendency figyelés
         if (delta.y > 0.1f)
             jumpTendency = Mathf.Clamp01(jumpTendency + 0.05f);
         else
             jumpTendency = Mathf.Clamp01(jumpTendency - 0.02f);
 
-        // Aggresszió a player távolsága alapján
+        //Aggresszió a player távolsága alapján
         float dist = Vector2.Distance(player.position, transform.position);
         float proximity = Mathf.Clamp01(1f - dist / 5f);
         adaptiveAggressionMemory = Mathf.Lerp(adaptiveAggressionMemory, proximity, 0.1f);
@@ -184,7 +184,7 @@ public class BossLearningMemory : MonoBehaviour
     public float BossHealthPercent() =>
         bossHealth != null ? Mathf.Clamp01(bossHealth.currentHealth / bossHealth.startingHealth) : 1f;
 
-    // --- Player magasság- és távolság információ ---
+    //Player magasság és távolság információ
     public float PlayerDistanceFraction(Transform boss, Transform player, float maxDistance = 10f)
     {
         if (player == null || boss == null) return 0f;

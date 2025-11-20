@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ActivateRoomPoint : MonoBehaviour
 {
-    [SerializeField] public GameObject objectToShow; // most public, hogy más script is elérje
+    [SerializeField] public GameObject objectToShow;
 
     private void Start()
     {

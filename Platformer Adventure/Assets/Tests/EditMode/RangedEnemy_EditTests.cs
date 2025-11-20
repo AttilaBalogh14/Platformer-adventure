@@ -41,7 +41,7 @@ public class RangedEnemyEditModeTests
             Object.DestroyImmediate(proj);
     }
 
-    //1. Ha van inaktív projectile → azt adja vissza
+    //1. Ha van inaktív projectile, akkor azt adja vissza
     [Test]
     public void FindInactiveProjectile_ReturnsCorrectIndex()
     {
@@ -56,7 +56,7 @@ public class RangedEnemyEditModeTests
         Assert.AreEqual(1, index);
     }
 
-    //2. Ha minden projectile aktív → fallback = 0
+    //2. Ha minden projectile aktív, akkor fallback = 0
     [Test]
     public void FindInactiveProjectile_WhenAllActive_ReturnsZero()
     {

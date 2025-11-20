@@ -17,11 +17,10 @@ public class BossForceAttack : MonoBehaviour
 
     public void Execute()
     {
-        // Hang lejátszása
         if (SoundManager.instance != null && shootSound != null)
             SoundManager.instance.PlaySound(shootSound);
 
-        // Lövés minden firePoint-ról
+        //Lövés minden firePoint-ról
         foreach (Transform point in firePoints)
         {
             int idx = GetAvailableProjectile();
@@ -37,7 +36,7 @@ public class BossForceAttack : MonoBehaviour
             projectile.transform.position = point.position;
             projectile.transform.localScale = Vector3.one;
 
-            // Lövedék iránya a firePoint aktuális iránya szerint
+            //Lövedék iránya a firePoint aktuális iránya szerint
             Vector2 direction = point.right.normalized;
             if (point.lossyScale.x < 0)
                 direction = -direction;

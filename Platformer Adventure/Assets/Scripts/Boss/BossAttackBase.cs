@@ -7,27 +7,21 @@ public abstract class BossAttackBase : MonoBehaviour
     public float cooldown = 1f;
     public float damage = 1f;
 
-    // 🔹 Esemény: a támadás befejeződött (talált vagy sem)
+    //A támadás befejeződött (talált vagy sem)
     public event Action<BossAttackBase, bool> OnAttackResolved;
 
-    /// <summary>
-    /// A BossAttackManager ezen keresztül kaphat információt a támadás sikerességéről.
-    /// </summary>
+    ///A BossAttackManager ezen keresztül kaphat információt a támadás sikerességéről
     public void ResolveAttack(bool hit)
     {
         OnAttackResolved?.Invoke(this, hit);
     }
 
-    /// <summary>
-    /// Az AI döntési logikája ezt hívja, hogy pontozza, mennyire érdemes ezt a támadást használni.
-    /// </summary>
+    ///Az AI döntési logikája ezt hívja, hogy pontozza, mennyire érdemes ezt a támadást használni
     public virtual float GetHeuristicScore(Transform player, Transform boss)
     {
         return 0f; // alapértelmezett
     }
 
-    /// <summary>
-    /// A támadás konkrét végrehajtása.
-    /// </summary>
+    ///A támadás konkrét végrehajtása
     public abstract void Execute(Transform player);
 }

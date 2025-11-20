@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class FallingPlatform : MonoBehaviour
 {
-    [SerializeField] private float fallDelay = 0.5f; // mennyi idő múlva essen le
-    [SerializeField] private float destroyDelay = 2f; // mennyi idő múlva semmisüljön meg
+    [SerializeField] private float fallDelay = 0.5f; //mennyi idő múlva essen le
+    [SerializeField] private float destroyDelay = 2f; //mennyi idő múlva semmisüljön meg
 
     private Rigidbody2D rb;
     private bool isFalling = false;
@@ -12,7 +12,6 @@ public class FallingPlatform : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
 
-        // alapból ne essen le (statikus állapot)
         rb.bodyType = RigidbodyType2D.Kinematic;
     }
 
@@ -27,7 +26,7 @@ public class FallingPlatform : MonoBehaviour
 
     private void StartFalling()
     {
-        rb.bodyType = RigidbodyType2D.Dynamic; // mostantól a fizika irányítja
-        Destroy(gameObject, destroyDelay);     // pár mp múlva eltűnik
+        rb.bodyType = RigidbodyType2D.Dynamic; //mostantól a fizika irányítja
+        Destroy(gameObject, destroyDelay);
     }
 }

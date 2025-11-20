@@ -61,10 +61,8 @@ public class EnemyPatrol : MonoBehaviour
         idleCounter = 0f;
         anim.SetBool("moving", true);
 
-        //Make enemy face the direction
         enemy.localScale = new Vector3(Mathf.Abs(initialScale.x) * direction, initialScale.y, initialScale.z);
-
-        //Move in that direction
+        
         enemy.position = new Vector3(enemy.position.x + Time.deltaTime * direction * moveSpeed, enemy.position.y, enemy.position.z);
     }
 

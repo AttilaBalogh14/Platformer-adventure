@@ -130,7 +130,7 @@ public class BossAttackManager : MonoBehaviour
         else if (attack is BossAttackDown)
             baseScore = FuzzyLogic.SoftAnd(distNear, hpLow) * 7f + FuzzyLogic.Low(playerHeight) * 5f;
 
-        // taktika súlyozás
+        //taktika súlyozás
         switch (tactic)
         {
             case BossTactic.Aggressive: baseScore *= 1.2f; break;
@@ -142,7 +142,7 @@ public class BossAttackManager : MonoBehaviour
         float learned = memory.GetEffectiveness(attack);
         baseScore = Mathf.Lerp(baseScore, baseScore * 1.5f, learned);
 
-        // kis random faktor, hogy ritkábban használt támadások is előjöjjenek
+        //kis random faktor, hogy ritkábban használt támadások is előjöjjenek
         baseScore += UnityEngine.Random.Range(-1f, 1.5f);
         return Mathf.Clamp(baseScore, 0f, 15f);
     }

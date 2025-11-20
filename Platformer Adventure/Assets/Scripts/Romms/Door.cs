@@ -36,13 +36,13 @@ public class Door : MonoBehaviour
         Room targetRoom = roomToActivate.GetComponent<Room>();
         Room oldRoom = roomToDeactivate.GetComponent<Room>();
 
-        // ➜ Kamera mozgás a room kamera pontjára
+        //Kamera mozgás a room kamera pontjára
         if (cam != null && targetRoom.CameraPoint != null)
             cam.MoveToNewRoom(targetRoom.CameraPoint);
         else if (cam != null)
-            cam.MoveToNewRoom(roomToActivate); // fallback
+            cam.MoveToNewRoom(roomToActivate); //fallback
 
-        // ➜ Room aktiválás/deaktiválás
+        //Room aktiválás/deaktiválás
         targetRoom.ActivateRoom(true);
         oldRoom.ActivateRoom(false);
     }

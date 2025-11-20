@@ -43,7 +43,7 @@ public class Health : MonoBehaviour
     private Rigidbody2D rb;
     private Collider2D col;
 
-    // Eredeti Rigidbody értékek mentése
+    //Eredeti Rigidbody értékek mentése
     private float originalGravityScale;
     private RigidbodyConstraints2D originalConstraints;
 
@@ -112,7 +112,7 @@ public class Health : MonoBehaviour
 
         if (CompareTag("Player"))
         {
-            // 🔹 Nyissuk ki az összes szobát halálkor (inaktívakat is megtaláljuk)
+            //Nyissuk ki az összes szobát halálkor (inaktívakat is megtaláljuk)
             foreach (var roomActivator in FindObjectsOfType<ActivateRoomPoint>(true))
             {
                 if (roomActivator != null && roomActivator.objectToShow != null)
@@ -121,30 +121,22 @@ public class Health : MonoBehaviour
                 }
             }
 
-            /*foreach (var roomDeactivator in FindObjectsOfType<DeactivateRoomPoint>(true))
-            {
-                if (roomDeactivator != null && roomDeactivator.objectToHide != null)
-                {
-                    roomDeactivator.objectToHide.SetActive(false);
-                }
-            }*/
-
             deathCount++;
             isGameOver = true;
 
             if (uIManager != null)
             {
-                // 🔹 Tiltsuk le a pause-t halál után
+                //Tiltsuk le a pause-t halál után
                 uIManager.DisablePause();
                 uIManager.StartCoroutine(uIManager.ShowGameOverScreenWithDelay(1f));
             }
 
-            // 🔹 Boss resetelése, ha aktív
+            //Boss resetelése, ha aktív
             BossMovement boss = FindObjectOfType<BossMovement>();
             if (boss != null && boss.BossIsAwake())
                 boss.ResetBoss();
 
-            Debug.Log("🔓 All rooms opened after player death!");
+            Debug.Log("All rooms opened after player death!");
         }
 
         if (CompareTag("Trap"))
@@ -341,7 +333,7 @@ public class Health : MonoBehaviour
 
         StartHurtInvulnerability();
 
-        // ✅ Pause újra engedélyezése
+        //Pause újra engedélyezése
         if (uIManager != null)
             uIManager.EnablePause();
 

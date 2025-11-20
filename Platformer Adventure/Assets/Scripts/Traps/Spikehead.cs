@@ -18,7 +18,7 @@ public class Spikehead : EnemyDamage
     [Header("SFX")]
     [SerializeField] private AudioClip impactSfx;
 
-    private Health selfHealth; // saját health
+    private Health selfHealth;
 
     void Awake()
     {
@@ -30,12 +30,11 @@ public class Spikehead : EnemyDamage
         ResetSpikehead();
 
         if (selfHealth != null)
-            selfHealth.ResetHealth(); // újraindításkor visszaáll az élete
+            selfHealth.ResetHealth();
     }
 
     private void Update()
     {
-        //Move spikehead to destination only if attacking 
         if (isAttacking)
         {
             Move();
@@ -57,7 +56,6 @@ public class Spikehead : EnemyDamage
     {
         UpdateDirections();
 
-        //check if spikehead sees player in all 4 directions
         for (int i = 0; i < possibleDirections.Length; i++)
         {
             Debug.DrawRay(transform.position, possibleDirections[i], Color.red);
@@ -73,15 +71,15 @@ public class Spikehead : EnemyDamage
     } 
     private void UpdateDirections()
     {
-        possibleDirections[0] = transform.right * detectionRange; //right direction
-        possibleDirections[1] = -transform.right * detectionRange; //left direction
-        possibleDirections[2] = transform.up * detectionRange; //up direction
-        possibleDirections[3] = -transform.up * detectionRange; //right direction
+        possibleDirections[0] = transform.right * detectionRange;
+        possibleDirections[1] = -transform.right * detectionRange;
+        possibleDirections[2] = transform.up * detectionRange;
+        possibleDirections[3] = -transform.up * detectionRange;
     }
 
     private void ResetSpikehead()
     {
-        moveDirection = transform.position; //set destination as current position so it doesnt move 
+        moveDirection = transform.position;  
         isAttacking = false;
         checkTimer = 0f;
     }
@@ -90,6 +88,6 @@ public class Spikehead : EnemyDamage
     {
         SoundManager.instance.PlaySound(impactSfx);
         base.OnTriggerEnter2D(collision);
-        ResetSpikehead(); //stop spikehead once he hits something
+        ResetSpikehead();
     }
 }

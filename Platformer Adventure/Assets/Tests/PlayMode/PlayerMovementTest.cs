@@ -12,7 +12,7 @@ public class PlayerMovementTests
     [UnitySetUp]
     public IEnumerator Setup()
     {
-        // Betöltjük a Level1 scene-t
+        //Betöltjük a Level1 scene-t
         yield return SceneManager.LoadSceneAsync("Level1");
 
         player = GameObject.FindWithTag("Player");
@@ -21,7 +21,7 @@ public class PlayerMovementTests
         movement = player.GetComponent<PlayerMovement>();
         Assert.IsNotNull(movement, "A PlayerMovement script hiányzik a Player-ről!");
 
-        // Teszt input nullázása
+        //Teszt input nullázása
         movement.SetHorizontalInput(0f);
     }
 
@@ -30,7 +30,7 @@ public class PlayerMovementTests
     {
         float startX = player.transform.position.x;
 
-        movement.SetHorizontalInput(1f); // jobbra
+        movement.SetHorizontalInput(1f); //jobbra
 
         yield return new WaitForSeconds(0.2f);
 
@@ -42,7 +42,7 @@ public class PlayerMovementTests
     {
         float startX = player.transform.position.x;
 
-        movement.SetHorizontalInput(-1f); // balra
+        movement.SetHorizontalInput(-1f); //balra
 
         yield return new WaitForSeconds(0.2f);
 

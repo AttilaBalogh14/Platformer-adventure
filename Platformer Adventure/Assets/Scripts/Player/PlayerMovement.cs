@@ -35,20 +35,20 @@ public class PlayerMovement : MonoBehaviour
 
     private Health playerHealth;
 
-    // 🔹 eredeti értékek mentéséhez
+    //eredeti értékek mentéséhez
     private float originalMoveSpeed;
     private float originalJumpStrength;
     private int originalBonusJumps;
     private Coroutine speedBoostCoroutine;
     private bool isCrouching;
 
-    // 🔹 BoxCollider méretek
+    //BoxCollider méretek
     private Vector2 standingOffset = new Vector2(0.0465f, -0.520f);
     private Vector2 standingSize = new Vector2(0.8738f, 1.3773f);
     private Vector2 crouchingOffset = new Vector2(0.0465f, -0.723f);
     private Vector2 crouchingSize = new Vector2(0.8738f, 0.9721f);
 
-    // 🔹 Teszt input
+    //Teszt input
     [SerializeField] private bool useTestingInput = false;
     private float testingHorizontalInput = 0f;
 

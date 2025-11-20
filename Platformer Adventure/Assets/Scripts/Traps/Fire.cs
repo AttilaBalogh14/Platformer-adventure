@@ -18,22 +18,18 @@ public class Fire : MonoBehaviour
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        // Aktiváljuk az animációt rögtön
         if (anim != null)
             anim.SetBool("activated", true);
 
-        // Szín visszaállítása normálra
         if (spriteRenderer != null)
             spriteRenderer.color = Color.white;
     }
 
     void Update()
     {
-        // Aktiváljuk az animációt rögtön
         if (anim != null)
             anim.SetBool("activated", true);
 
-        // Szín visszaállítása normálra
         if (spriteRenderer != null)
             spriteRenderer.color = Color.white;
     }
@@ -55,7 +51,6 @@ public class Fire : MonoBehaviour
         if (collision.CompareTag("Player") && playerHealth != null)
         {
             playerHealth.TakeDamage(damageAmount); 
-            // folyamatos sebzés frame-enként (adjustálhatod)
         }
     }
 

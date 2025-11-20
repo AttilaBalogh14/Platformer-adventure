@@ -24,7 +24,7 @@ public class BossAttackDown : BossAttackBase
         anim.SetTrigger("attack02");
     }
 
-    // Animation Event hívja
+    //Animation Event hívja
     public void ShootDown()
     {
         foreach (Transform point in firePoints)
@@ -50,7 +50,7 @@ public class BossAttackDown : BossAttackBase
             if (projectile.TryGetComponent<BossProjectile>(out BossProjectile proj))
             {
                 proj.SetDirectionAndLaunch(direction);
-                proj.OnHitPlayer += () => ResolveAttack(true); // 🔹 Csak találat esetén
+                proj.OnHitPlayer += () => ResolveAttack(true); //Csak találat esetén
             }
         }
     }

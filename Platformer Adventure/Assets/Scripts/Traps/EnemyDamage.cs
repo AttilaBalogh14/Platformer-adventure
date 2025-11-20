@@ -25,7 +25,7 @@ public class EnemyDamage : MonoBehaviour
     public void TryDamage(Collider2D collision)
     {
         Health health = collision.GetComponent<Health>();
-        if (health != null && health.CanGetDamage()) // Csak akkor sebez, ha nincs i-frame
+        if (health != null && health.CanGetDamage()) //Csak akkor sebez, ha nincs i-frame
         {
             health.TakeDamage(damage);
         }

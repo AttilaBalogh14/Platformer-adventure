@@ -35,7 +35,6 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Ha checkpoint, ne csináljunk semmit
         if (collision.CompareTag("Checkpoint"))
             return;
 
@@ -74,7 +73,6 @@ public class Projectile : MonoBehaviour
             scaleX = -scaleX;
         }
 
-        //string state =  gameObject.activeSelf.ToString();
         transform.localScale = new Vector3(scaleX, transform.localScale.y, transform.localScale.z);
     }
 

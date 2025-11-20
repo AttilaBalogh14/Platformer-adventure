@@ -31,7 +31,7 @@ public class EnemyProjectile : EnemyDamage
 
         coll.enabled = true;
 
-        // Ha Rigidbody van, reseteljük a sebességet
+        //Ha Rigidbody van, reseteljük a sebességet
         if (rb != null)
         {
             rb.velocity = Vector2.zero;
@@ -52,7 +52,6 @@ public class EnemyProjectile : EnemyDamage
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Ha checkpoint, átmegyünk rajta
         if (collision.CompareTag("Checkpoint"))
             return;
 
@@ -62,13 +61,11 @@ public class EnemyProjectile : EnemyDamage
         hasHit = true;
         coll.enabled = false;
 
-        // Trigger parent logic
         base.OnTriggerEnter2D(collision);
 
         if (anim != null)
         {
             anim.SetTrigger("explode");
-            // Deaktiválást animáció végére kössük AnimationEvent-tel
         }
         else
         {

@@ -5,11 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class PlayerRespawn : MonoBehaviour
 {
-    [SerializeField] private AudioClip checkpointSound; // Hang, amikor új checkpointot aktiválunk
-    private Transform currentCheckpoint; // Utolsó elért checkpoint
+    [SerializeField] private AudioClip checkpointSound;
+    private Transform currentCheckpoint; //Utolsó elért checkpoint
     private Health playerHealth;
     private UIManager uiManager;
-    private static Vector3 checkpointPosition = Vector3.zero; // Statikus, hogy megmaradjon scene reload után
+    private static Vector3 checkpointPosition = Vector3.zero; //Statikus, hogy megmaradjon scene reload után
 
     [Header("Score")]
     [SerializeField] private int checkpointScoreValue;
@@ -25,21 +25,8 @@ public class PlayerRespawn : MonoBehaviour
 
     public void CheckRespawn()
     {
-        // Game Over képernyő megjelenítése
+        //Game Over képernyő megjelenítése
         uiManager.GameOver();
-
-        /*
-        if (currentCheckpoint == null)
-        {
-            restartButton.SetActive(true);
-            checkpointButton.SetActive(false);
-        }
-        else
-        {
-            restartButton.SetActive(false);
-            checkpointButton.SetActive(true);
-        }
-        */
     }
 
     public void ResetCurrentCheckpoint()
@@ -53,11 +40,11 @@ public class PlayerRespawn : MonoBehaviour
 
         if (currentCheckpoint != null || checkpointPosition != Vector3.zero)
         {
-            // --- 1️⃣ Pozíció visszaállítása ---
+            //Pozíció visszaállítása
             Vector3 respawnPos = currentCheckpoint != null ? currentCheckpoint.position : checkpointPosition;
             transform.position = respawnPos;
 
-            // Rigidbody2D frissítése
+            //Rigidbody2D frissítése
             Rigidbody2D rb = GetComponent<Rigidbody2D>();
             if (rb != null)
             {
@@ -65,10 +52,10 @@ public class PlayerRespawn : MonoBehaviour
                 rb.position = respawnPos;
             }
 
-            // --- 2️⃣ Élet visszaállítása ---
+            //Élet visszaállítása
             playerHealth.Respawn();
 
-            // --- 3️⃣ Szoba és kamera beállítása ---
+            //Szoba és kamera beállítása
             Room checkpointRoom = null;
 
             if (currentCheckpoint != null)
@@ -76,10 +63,10 @@ public class PlayerRespawn : MonoBehaviour
 
             if (checkpointRoom != null)
             {
-                // Szoba aktiválása (ellenségek, animációk, stb.)
+                //Szoba aktiválása
                 checkpointRoom.ActivateRoom(true);
 
-                // Kamera áthelyezése a szoba kamera fókuszpontjára
+                //Kamera áthelyezése a szoba kamera fókuszpontjára
                 CameraController cam = Camera.main.GetComponent<CameraController>();
                 if (cam != null)
                 {
@@ -95,18 +82,18 @@ public class PlayerRespawn : MonoBehaviour
             }
             else
             {
-                // fallback: ha nem található Room komponens
+                //fallback ha nem található Room komponens
                 Debug.LogWarning("Checkpointhoz nem tartozik Room!");
                 CameraController cam = Camera.main.GetComponent<CameraController>();
                 if (cam != null)
                     cam.MoveToNewRoom(currentCheckpoint != null ? currentCheckpoint : transform);
             }
 
-            // --- 4️⃣ UI visszaállítása ---
+            //UI visszaállítása
             uiManager.gameOverScreen.SetActive(false);
             Time.timeScale = 1;
 
-            // --- 5️⃣ Pontszám visszaállítása ---
+            //Pontszám visszaállítása
             if (GameScoreManager.Instance != null)
             {
                 GameScoreManager.Instance.SetScore(GameScoreManager.checkpointScore);
@@ -117,14 +104,14 @@ public class PlayerRespawn : MonoBehaviour
         }
         else
         {
-            // Ha nincs mentett checkpoint
+            //Ha nincs mentett checkpoint
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             Time.timeScale = 1;
             Debug.LogWarning("Nincs mentett checkpoint! Újrakezdés...");
         }
     }
 
-    // --- 6️⃣ Checkpoint aktiválása ---
+    //Checkpoint aktiválása
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Checkpoint"))

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class DeactivateRoomPoint : MonoBehaviour
 {
-    [SerializeField] public GameObject objectToHide; // most public
+    [SerializeField] public GameObject objectToHide;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

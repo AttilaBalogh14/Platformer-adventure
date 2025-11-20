@@ -4,7 +4,7 @@ using System.Collections;
 
 public class BossProjectile : MonoBehaviour
 {
-    public event Action OnHitPlayer; // 🔹 Esemény a játékos találatra
+    public event Action OnHitPlayer; //Esemény a játékos találatra
 
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 8f;
@@ -82,7 +82,7 @@ public class BossProjectile : MonoBehaviour
             if (hp != null)
                 hp.TakeDamage(1);
 
-            OnHitPlayer?.Invoke(); // 🔹 Csak akkor jelez, ha eltalálta a játékost
+            OnHitPlayer?.Invoke(); //Csak akkor jelez, ha eltalálta a játékost
         }
     }
 
