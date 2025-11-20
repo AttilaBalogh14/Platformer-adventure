@@ -9567,9 +9567,9 @@ MonoBehaviour:
   projectileLayer:
     serializedVersion: 2
     m_Bits: 1
-  detectionRange: 6
+  detectionRange: 2
   colliderDistance: 0.5
-  jumpForce: 10
+  jumpForce: 11
   avoidCooldown: 0
   bossHeatlhBar: {fileID: 896071910}
   BossRoomDoorTerrainLeft: {fileID: 1226799667}
@@ -10554,18 +10554,6 @@ MonoBehaviour:
       - m_Target: {fileID: 1608892222}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
         m_MethodName: Restart
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1784004809}
-        m_TargetAssemblyTypeName: PlayerRespawn, Assembly-CSharp
-        m_MethodName: ResetCurrentCheckpoint
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -15741,7 +15729,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1867766878081384114, guid: 36cbc7cc1547d4d4f96a03d1420a2986, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.8899994
+      value: -2.81
       objectReference: {fileID: 0}
     - target: {fileID: 1867766878081384114, guid: 36cbc7cc1547d4d4f96a03d1420a2986, type: 3}
       propertyPath: m_LocalPosition.y
@@ -30583,7 +30571,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1867766878081384114, guid: 36cbc7cc1547d4d4f96a03d1420a2986, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.5699997
+      value: -4.52
       objectReference: {fileID: 0}
     - target: {fileID: 1867766878081384114, guid: 36cbc7cc1547d4d4f96a03d1420a2986, type: 3}
       propertyPath: m_LocalPosition.y
@@ -32237,6 +32225,16 @@ MonoBehaviour:
   gameOverScreen: {fileID: 809478678}
   gameOverSound: {fileID: 8300000, guid: d2704b6ddae152f44a904d3885f5edf4, type: 3}
   pauseScreen: {fileID: 25557052}
+  Controls: {fileID: 1243294880}
+  OtherOptions:
+  - {fileID: 1774024139}
+  - {fileID: 677666663}
+  - {fileID: 1324961186}
+  - {fileID: 1079586282}
+  - {fileID: 656906775}
+  - {fileID: 1701089175}
+  - {fileID: 1992387196}
+  - {fileID: 2085915812}
 --- !u!1 &1610021721
 GameObject:
   m_ObjectHideFlags: 0
@@ -43948,7 +43946,7 @@ PrefabInstance:
       objectReference: {fileID: 8300000, guid: d2704b6ddae152f44a904d3885f5edf4, type: 3}
     - target: {fileID: 151125022573480323, guid: 6693cc58913f47f498eedca86f4fc628, type: 3}
       propertyPath: startingHealth
-      value: 100
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 151125022573480323, guid: 6693cc58913f47f498eedca86f4fc628, type: 3}
       propertyPath: gameScoreManager

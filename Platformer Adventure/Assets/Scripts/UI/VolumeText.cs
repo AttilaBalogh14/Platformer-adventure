@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class VolumeText : MonoBehaviour
 {
     [SerializeField] private string volumeName;
-    [SerializeField] private string textIntro; //Sound: or Music:
+    [SerializeField] private string textIntro;
     private Text txt;
 
     void Awake()

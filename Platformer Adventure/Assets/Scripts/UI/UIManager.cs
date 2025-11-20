@@ -11,12 +11,13 @@ public class UIManager : MonoBehaviour
 
     [Header("Pause")]
     [SerializeField] private GameObject pauseScreen;
+    [SerializeField] private GameObject Controls;
+    [SerializeField] private GameObject[] OtherOptions;
     private Health health;
 
     private PlayerRespawn playerRespawn;
 
-    private bool canPause = true; // 🔹 új: tiltás engedélyezése
-
+    private bool canPause = true;
     private void Awake()
     {
         gameOverScreen.SetActive(false);
@@ -28,9 +29,17 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        if (!canPause) return; // 🔹 ha tiltva van, ne engedje a pause-t
+        if (!canPause) return;
 
-        if (Input.GetKeyDown(KeyCode.Escape) && !health.IsGameOver())
+        if (Input.GetKeyDown(KeyCode.Escape) && !health.IsGameOver() && Controls.activeSelf)
+        {
+            Controls.SetActive(false);
+            foreach (var option in OtherOptions)
+            {
+                option.SetActive(true);
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape) && !health.IsGameOver())
         {
             if (pauseScreen.activeInHierarchy)
                 PauseGame(false);
@@ -44,28 +53,26 @@ public class UIManager : MonoBehaviour
     public void GameOver()
     {
         gameOverScreen.SetActive(true);
-        SoundManager.instance.PlaySound(gameOverSound);
+        //SoundManager.instance.PlaySound(gameOverSound);
     }
 
     public void Restart()
     {
-        EnablePause(); // újra engedélyezzük a pause-t
+        EnablePause(); //újra engedélyezzük a pause-t
 
-        // --- 🧩 Checkpoint törlése ---
+        //Checkpoint törlése
         if (playerRespawn != null)
         {
             playerRespawn.ResetCurrentCheckpoint();
-            // Statikus checkpoint pozíciót is töröljük
+            
             typeof(PlayerRespawn)
                 .GetField("checkpointPosition", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
                 ?.SetValue(null, Vector3.zero);
         }
 
-        // --- 🧩 Pontszám nullázása (opcionális) ---
         if (GameScoreManager.Instance != null)
             GameScoreManager.checkpointScore = 0;
 
-        // --- 🧩 Scene újratöltése ---
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         Time.timeScale = 1;
 
@@ -110,7 +117,6 @@ public class UIManager : MonoBehaviour
     }
     #endregion
 
-    // 🔹 új: halál utáni pause-tiltás
     public void DisablePause()
     {
         canPause = false;
@@ -127,5 +133,14 @@ public class UIManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(delay);
         gameOverScreen.SetActive(true);
         Time.timeScale = 0;
+    }
+
+    public void Control()
+    {
+        Controls.SetActive(true);
+        foreach (var option in OtherOptions)
+        {
+            option.SetActive(false);
+        }
     }
 }

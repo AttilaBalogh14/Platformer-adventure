@@ -5,9 +5,9 @@ using TMPro;  // Hozzáadva a TextMeshPro-hoz
 public class BossHealthBar : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private GameObject boss;      // A boss GameObject
-    [SerializeField] private Image healthBarFill;  // A fill Image a sávban
-    [SerializeField] private TMP_Text healthPercentageText; // TextMeshPro Text
+    [SerializeField] private GameObject boss;      //A boss GameObject
+    [SerializeField] private Image healthBarFill;  //A fill Image a sávban
+    [SerializeField] private TMP_Text healthPercentageText; //TextMeshPro Text
 
     private Health bossHealth;
 

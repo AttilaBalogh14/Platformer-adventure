@@ -17,16 +17,20 @@ public class PlayerRespawn : MonoBehaviour
     [SerializeField] private GameObject restartButton;
     [SerializeField] private GameObject checkpointButton;
 
+    private BossMovement bossMovement;
+
     void Awake()
     {
         playerHealth = GetComponent<Health>();
         uiManager = FindObjectOfType<UIManager>();
+        bossMovement = FindObjectOfType<BossMovement>();
     }
 
     public void CheckRespawn()
     {
         //Game Over képernyő megjelenítése
-        uiManager.GameOver();
+        uiManager.GameOver();        
+
     }
 
     public void ResetCurrentCheckpoint()
@@ -133,5 +137,10 @@ public class PlayerRespawn : MonoBehaviour
 
             Debug.Log("Checkpoint elérve: " + checkpointPosition);
         }
+    }
+
+    public void ResetCurrentheckpoint()
+    {
+        currentCheckpoint = null;
     }
 }

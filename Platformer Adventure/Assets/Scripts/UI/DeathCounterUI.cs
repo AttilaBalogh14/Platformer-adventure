@@ -14,7 +14,7 @@ public class DeathCounterUI : MonoBehaviour
 
     private void Update()
     {
-        // Frissítjük a szöveget a static deathCount változóval
+        //Frissítjük a szöveget a static deathCount változóval
         deathCountText.text = Health.DeathCounter().ToString();
     }
 }

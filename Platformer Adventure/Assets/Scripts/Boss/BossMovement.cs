@@ -89,7 +89,6 @@ public class BossMovement : MonoBehaviour
         HandleJumpAnimation();
     }
 
-    // 🔹 csak egyszer fut le
     private void HandleDeath()
     {
         if (hasHandledDeath) return;
